@@ -34,8 +34,8 @@ class Ability:
 
 def damage(ability, target, lowerBound, upperBound):
     amount = ability.caster.dealDamage(target, lowerBound + random() * (upperBound - lowerBound))
-    output.say("You deal " + output.formatNumber(amount) + " damage to the " + str(target) + " with " + ability.name + "!" if ability.caster.isPlayer else "The " + str(ability.caster) + " does " + output.formatNumber(amount) + " damage to you with " + ability.name + "!")
+    output.say("You deal " + output.formatNumber(amount) + " damage to " + target.the + " with " + ability.name + "!" if ability.caster.isPlayer else "The " + str(ability.caster) + " does " + output.formatNumber(amount) + " damage to you with " + ability.name + "!")
 
 def heal(ability, target, lowerBound, upperBound):
     amount = ability.caster.recoverHealth(lowerBound + random() * (upperBound - lowerBound))
-    output.say("You restore " + output.formatNumber(amount) + " health to yourself with " + ability.name + "." if ability.caster.isPlayer else "The " + str(ability.caster) + " restores " + output.formatNumber(amount) + " health to itself with " + ability.name + ".")
+    output.say("You restore " + output.formatNumber(amount) + " health to yourself with " + ability.name + "." if ability.caster.isPlayer else ability.caster.the + " restores " + output.formatNumber(amount) + " health to itself with " + ability.name + ".")

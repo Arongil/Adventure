@@ -1,4 +1,5 @@
 from random import random
+import copy
 import output
 import interaction
 
@@ -10,9 +11,9 @@ class Fight(interaction.Interaction):
 
     def start(self):
         self.monster = self.getMonster()
-        self.monster.reset() # reset the monster's stats (it may have been fought before, as only one instance of each monster is used)
+        self.monster.reset() # the same instance of the monster may have already been fought
         output.bar()
-        output.declare("You have been attacked by " + ("" if self.monster.unique else "a ") + str(self.monster) + "!")
+        output.declare("You have been attacked by " + self.monster.a + "!")
         output.bar()
     
     def tick(self):
@@ -26,7 +27,7 @@ class Fight(interaction.Interaction):
 
     def end(self):
         if self.player.health > 0:
-            output.declare("You have defeated " + ("" if self.monster.unique else "the ") + str(self.monster) + "!")
+            output.declare("You have defeated " + self.monster.the + "!")
             self.monster.die()
         else:
             self.player.die()

@@ -8,7 +8,7 @@ import actions
 class Player(creature.Creature):
 
     def __init__(self, health, location):
-        creature.Creature.__init__(self, health)
+        creature.Creature.__init__(self, "player", health)
         self.location = location # the player's actions derive from its location
 
         # baseActions are actions the player can always take.
@@ -39,10 +39,8 @@ class Player(creature.Creature):
         self.level = 1
 
         self.isPlayer = True
+        self.unique = False
         self.alive = True
-
-    def __str__(self):
-        return "player"
 
     def updateActions(self):
         self.actions = self.baseActions + self.location.actions
@@ -87,4 +85,5 @@ class Player(creature.Creature):
     def attack(self, target):
         ability = input.inputFromOptions("attack", self.abilities, lambda ability: str(ability), lambda ability: not ability.onCooldown(), "Please select an ability that isn't on cooldown.")
         output.separate()
+        self.gear.proc(target)
         ability.activate(target)

@@ -5,7 +5,8 @@ import creatures.inventory as inventory
 
 class Creature:
 
-    def __init__(self, health, **kwargs):
+    def __init__(self, name, health, **kwargs):
+        self.name = name
         self.health = health
         self.stats = stats.Stats(
             health,
@@ -19,6 +20,18 @@ class Creature:
         self.gear = gear.Gear(self)
         self.abilities = None # FrequencyList or regular list of abilities that are used in combat
         self.effects = [] # list of effects (curses, blessings, etc.)
+        self.unique = True # default is to be referred to as "the ..."
+
+    def __str__(self):
+        return self.name
+
+    # output grammar: "an ogre attacks you" vs "Folloro attacks you" and "the wolf bites you" vs "Marmadon bites you"
+    @property
+    def a(self):
+        return "" if self.unique else ("an " if self.name[0].lower() in ["a", "e", "i", "o", "u"] else "a ") + str(self)
+    @property
+    def the(self):
+        return "" if self.unique else "the " + str(self)
 
     def dealDamage(self, target, damage):
         amount = self.stats.damageDealt(damage)

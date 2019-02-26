@@ -16,6 +16,22 @@ class Stats:
     def __str__(self):
         return output.formatNumber(self.health.getValue()) + " maximum health\n" + output.formatNumber(self.armor.getValue()) + " armor (reduces damage taken)\n" + output.formatNumber(self.strength.getValue()) + " strength (increases damage done)\n" + output.formatNumber(self.spirit.getValue()) + " spirit (increases healing done)\n" + output.formatNumber(self.criticalChance.getValue()*100) + "% chance of critical hits\n" + output.formatNumber(self.criticalStrike.getValue()*100) + "% damage done by critical hits"
 
+    def add(self, **kwargs):
+        self.health.add(kwargs.get("health") if "health" in kwargs else 0)
+        self.armor.add(kwargs.get("armor") if "armor" in kwargs else 0)
+        self.strength.add(kwargs.get("strength") if "strength" in kwargs else 0)
+        self.spirit.add(kwargs.get("spirit") if "spirit" in kwargs else 0)
+        self.criticalChance.add(kwargs.get("criticalChance") if "criticalChance" in kwargs else 0)
+        self.criticalStrike.add(kwargs.get("criticalStrike") if "criticalStrike" in kwargs else 0)
+
+    def mult(self, **kwargs):
+        self.health.mult(kwargs.get("health") if "health" in kwargs else 0)
+        self.armor.mult(kwargs.get("armor") if "armor" in kwargs else 0)
+        self.strength.mult(kwargs.get("strength") if "strength" in kwargs else 0)
+        self.spirit.mult(kwargs.get("spirit") if "spirit" in kwargs else 0)
+        self.criticalChance.mult(kwargs.get("criticalChance") if "criticalChance" in kwargs else 0)
+        self.criticalStrike.mult(kwargs.get("criticalStrike") if "criticalStrike" in kwargs else 0)
+
     # modify the damage done by an attack
     def damageDealt(self, damage):
         modifier = 1 + self.strength.getValue() / self.scale

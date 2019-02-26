@@ -1,7 +1,7 @@
 class Inventory:
 
     def __init__(self, gold = 0, items = []):
-        self.gold = 999#gold
+        self.gold = gold
         self.items = items
     
     def __str__(self):
