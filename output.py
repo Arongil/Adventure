@@ -22,14 +22,8 @@ def separate():
 
 def formatNumber(n):
     integerDiff = abs(n) - int(abs(n))
-    if integerDiff < 0.0001:
+    if integerDiff < 0.1:
         return str(int(n))
-    elif integerDiff < 0.001:
-        return str(round(n, 4))
-    elif integerDiff < 0.01:
-        return str(round(n, 3))
-    elif integerDiff < 0.1:
-        return str(round(n, 2))
     else:
         return str(round(n, 1))
 

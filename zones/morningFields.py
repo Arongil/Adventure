@@ -1,4 +1,4 @@
-from random import random
+import random
 import globals
 import output
 import frequencyList as fList
@@ -54,6 +54,36 @@ class DrunkenTrainee(monster.Monster):
     def stumble(self):
         output.say("The drunken trainee stumbles and attempts to regain balance.")
 
+class GraglisTheGremlin(monster.Monster):
+
+    def __init__(self):
+        def voodooFetishProc(wearer, target):
+            if random.random() < 0.05:
+                output.say("Your voodoo fetish begins wailing softly, disorienting " + target.the + ".")
+                target.addEffect( effect.StrengthBuffAdd("voodoo stun", 2, -4) )
+
+        self.voodooFetish = gear.Trinket("voodoo fetish", "the force that governs voodoo is twisted and vague... only strange creatures commune with it well", 29, 99, lambda target: target.stats.add(criticalChance=0.1), lambda target: target.stats.add(criticalChance=-0.1), voodooFetishProc)
+        monster.Monster.__init__(self, "Graglis the Gremlin", 80, loot.Loot("Graglis the Gremlin", 16, 140, [
+                [self.voodooFetish, 1]
+            ]), [
+            # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
+            [ability.Ability("hop and scratch", 0, self, lambda ablty, target: ability.damage(ablty, target, 7, 16)), 0.5],
+            [ability.Ability("mutter nonsense", 0, self, lambda ablty, target: self.mutterNonsense()), 0.3],
+            [ability.Ability("voodoo", 6, self, lambda ablty, target: self.voodoo()), 0.2]
+        ], unique=True)
+        self.gear.equip(self.voodooFetish)
+
+    def mutterNonsense(self):
+        vocabulary = ["fizzle", "crack", "wow", "water", "fun", "bam", "shahoo", "wapwalee", "pow", "rats", "netter", "crab", "mast", "crazy", "polar", "braid", "blubber", "dollop", "doozy", "finagle", "gargoyle", "giggle", "shenanigans", "squabble", "wipee"]
+        gibberish = []
+        for i in range(6):
+            gibberish.append(random.choice(vocabulary))
+        output.say("Graglis the Gremlin bursts out into gleeful nonsense: " + ' '.join(gibberish).capitalize() + "!")
+
+    def voodoo(self):
+        output.say("Graglis begins to dance frantically, screaming gibberish all the while. Black mist forms reptilian strands in the air.")
+        self.addEffect( effect.StrengthBuffAdd("voodoo ritual", 6, 8) )
+
 def getTraineeValley():
     def enter():
         output.proclaim("Trainee Valley: Sparse trees occupy rolling expanses of lush grass. Fort Morning is barely visible in the distant north, while the Silent Forest looms to the east.")
@@ -76,7 +106,8 @@ def getTraineeValley():
     ]
     traineeValleyInteractions = [
         [actions.Nothing(), 0.8],
-        [fight.Fight(getMonster), 0.2]
+        [fight.Fight(getMonster), 0.2],
+        [fight.Fight(lambda: GraglisTheGremlin()), 0.008, True]
     ]
     return location.Location("Trainee Valley", enter, exit, traineeValleyActions, traineeValleyInteractions)
 
@@ -116,7 +147,7 @@ class SorcererOutcast(monster.Monster):
                 [item.Nothing(), 0.4],
                 [item.UsableItem("mysterious green brew", "it could be poison, it could be eternal life, it could be stool softener", 9, 49, lambda target: target.addEffect( effect.SpiritBuff("heightened spirits", 20, 2) )), 0.2],
                 [item.Item("cryptic spellbook", "the writing looks hasty and is in an elvish tongue", 30, 99), 0.2],
-                [gear.Helmet("pointy black hat", "several patches mottle the hat, including a long seam directly above the brim", 19, 49, lambda creature: creature.stats.add(criticalChance=0.1), lambda creature: creature.stats.add(criticalChance=-0.1)), 0.2]
+                [gear.Helmet("pointy black hat", "several patches mottle the hat, including a long seam directly above the brim", 19, 49, lambda creature: creature.stats.add(criticalChance=0.05), lambda creature: creature.stats.add(criticalChance=-0.05)), 0.2]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
             [ability.Ability("frostbolt", 0, self, lambda ablty, target: ability.damage(ablty, target, 8, 14)), 0.5],
@@ -241,26 +272,26 @@ class AricneaTheSly(monster.Monster):
 
     def __init__(self):
         def stingProc(wearer, target):
-            if random() < 0.06:
-                amount = wearer.dealDamage(target, 10 + random() * 8)
-                output.say("Dark tendrils burst from Sting, crushing " + ("" if target.unique else "the ") + str(target) + " and dealing " + output.formatNumber(amount) + " damage to it.")
+            if random.random() < 0.06:
+                amount = wearer.dealDamage(target, 10 + random.random() * 8)
+                output.say("Dark tendrils burst from Sting, crushing " + target.the + " and dealing " + output.formatNumber(amount) + " damage to it.")
 
         self.sting = gear.Weapon("Sting, Bone Reaper", "Aricnea's blade pulses with an ineffable energy", 89, 299, lambda target: target.stats.add(strength=12, criticalStrike=0.8), lambda target: target.stats.add(strength=-12, criticalStrike=-0.8), stingProc)
-        monster.Monster.__init__(self, "Aricnea the Sly", 160, loot.Loot("Aricnea the Sly", 16, 680, [
+        monster.Monster.__init__(self, "Aricnea the Sly", 220, loot.Loot("Aricnea the Sly", 38, 1460, [
                 [self.sting, 1]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("stab", 0, self, lambda ablty, target: ability.damage(ablty, target, 9, 19)), 0.6],
+            [ability.Ability("stab", 0, self, lambda ablty, target: ability.damage(ablty, target, 11, 19)), 0.6],
             [ability.Ability("fan of knives", 0, self, lambda ablty, target: ability.damage(ablty, target, 18, 26)), 0.2],
             [ability.Ability("draw shadows", 3, self, lambda ablty, target: ablty.caster.addEffect( effect.ArmorBuffAdd("draw shadows", 3, 18) )), 0.2]
         ], unique=True)
         self.gear.equip(self.sting)
         self.calledDogs = False
-        self.dogs = [[BoneHound(), 1]]
-        self.dogFight = fight.Fight(self.dogs)
+        self.dogs = fList.FrequencyList([[BoneHound(), 1]])
+        self.dogFight = fight.Fight(lambda: self.dogs.getOption())
 
     def attack(self, target):
-        if self.health < 40 and not self.calledDogs:
+        if self.health < 100 and not self.calledDogs:
             # The player fights two of Aricnea's dogs when Aricnea gets low on health.
             self.calledDogs = True
             output.bar()
@@ -270,7 +301,7 @@ class AricneaTheSly(monster.Monster):
             self.dogFight.activate()
             output.exclaim("Aaaah! You shall not defeat the forces of the undead... we are eternal!")
             self.addEffect( effect.HealOverTime("glory for the undead", 2, 30, 50) )
-            self.addEffect( effect.StrengthBuffAdd("battle rage", 9, 6) )
+            self.addEffect( effect.StrengthBuffAdd("battle rage", 9, 8) )
         else:
             self.abilities.getOption(lambda ability: not ability.onCooldown()).activate(target)
 

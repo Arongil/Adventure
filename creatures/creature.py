@@ -28,10 +28,10 @@ class Creature:
     # output grammar: "an ogre attacks you" vs "Folloro attacks you" and "the wolf bites you" vs "Marmadon bites you"
     @property
     def a(self):
-        return "" if self.unique else ("an " if self.name[0].lower() in ["a", "e", "i", "o", "u"] else "a ") + str(self)
+        return ("" if self.unique else ("an " if self.name[0].lower() in ["a", "e", "i", "o", "u"] else "a ")) + str(self)
     @property
     def the(self):
-        return "" if self.unique else "the " + str(self)
+        return ("" if self.unique else "the ") + str(self)
 
     def dealDamage(self, target, damage):
         amount = self.stats.damageDealt(damage)

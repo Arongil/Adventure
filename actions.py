@@ -19,8 +19,7 @@ class Quit(action.Action):
 
     def activate(self):
         output.say("Are you sure you want to quit?")
-        confirm = input.inputFromOptions("confirm", ["no", "yes"])
-        if confirm == "yes":
+        if input.yesNo():
             self.player.alive = False
             output.exclaim("Thank you for playing!")
 
@@ -127,8 +126,12 @@ class LevelBonus(action.Action):
 
     def activate(self):
         output.say("Which stat do you want to boost?")
-        stat = input.inputFromOptions(self.name, self.stats, lambda stat: stat.name + " by " + str(self.bonuses[stat.name]) + ", currently at " + str(stat.getValue()) + ".")
-        stat.add(self.bonuses[stat.name])
+        while True:
+            stat = input.inputFromOptions(self.name, self.stats, lambda stat: stat.name + " by " + str(self.bonuses[stat.name]) + ", currently at " + str(stat.getValue()) + ".")
+            output.say("Are you sure you want to boost " + str(stat.name) + " by " + str(self.bonuses[stat.name]) + "?")
+            if input.yesNo():
+                stat.add(self.bonuses[stat.name])
+                return
 
 class RestHeal(action.Action):
 
@@ -142,7 +145,7 @@ class RestHeal(action.Action):
         if self.player.health == self.player.stats.health.getValue():
             output.exclaim("You are at full health after resting!")
         else:
-            output.exclaim("You recover " + str(amount) + " health from resting. You now have " + output.formatNumber(self.player.health) + "/" + str(self.player.stats.health.getValue()) + " health.")
+            output.exclaim("You recover " + output.formatNumber(amount) + " health from resting. You now have " + output.formatNumber(self.player.health) + "/" + str(self.player.stats.health.getValue()) + " health.")
     
 class ScavengeGold(action.Action):
 
@@ -157,7 +160,7 @@ class ScavengeGold(action.Action):
         if amount == 0:
             output.exclaim("You find nothing while scavenging.")
         else:
-            output.exclaim("You find " + str(amount) + " gold while scavenging.")
+            output.exclaim("You find " + output.formatNumber(amount) + " gold while scavenging.")
 
 class FindItem(action.Action):
 
@@ -180,9 +183,13 @@ class OfferLocationChange(action.Action):
 
     def activate(self):
         output.proclaim(self.message)
-        choice = input.inputFromOptions("go", ["stay"] + self.locations)
-        if choice != "stay":
-            self.player.changeLocation(choice)
+        if len(self.locations) > 1:
+            choice = input.inputFromOptions("go", ["stay"] + self.locations)
+            if choice != "stay":
+                self.player.changeLocation(choice)
+        else:
+            if input.yesNo():
+                self.player.changeLocation(self.locations[0])
 
 class Scavenge(action.Action):
 

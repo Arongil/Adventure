@@ -32,13 +32,12 @@ class Shop:
                 number = input.getInt("amount", 1, choice.number)
                 self.player.inventory.removeItem(choice, number)
                 self.player.inventory.addGold(choice.sellCost * number)
-            output.say("Now you have " + str(self.player.inventory.gold) + " gold.")
 
     def itemString(self, choice):
         return "buy " + str(choice) + " for " + str(choice.buyCost) + " gold" if isinstance(choice, item.Item) else str(choice)
 
     def itemValid(self, choice):
-        return self.player.inventory.removeGold(choice.buyCost) if isinstance(choice, item.Item) else True
+        return self.player.inventory.gold >= choice.buyCost if isinstance(choice, item.Item) else True
 
     def activate(self):
         output.proclaim(self.message)
@@ -50,6 +49,19 @@ class Shop:
             elif choice == "sell":
                 self.sell()
             else:
-                self.player.inventory.addItem(copy.deepcopy(choice))
-                output.say("Purchased " + str(choice) + " for " + str(choice.buyCost) + " gold!")
+                # Check whether the player can afford multiple of the item; if they can, offer buying more than one.
+                canAfford = self.player.inventory.gold // choice.buyCost
+                cost = choice.buyCost
+                if canAfford < 2:
+                    self.player.inventory.addItem(copy.deepcopy(choice))
+                    output.say("Purchased " + str(choice) + " for " + str(choice.buyCost) + " gold!")
+                else:
+                    output.say("How many do you want to buy? You can afford between 1 and " + str(canAfford) + ".")
+                    number = input.getInt("amount", 1, canAfford)
+                    numberedCopy = copy.deepcopy(choice)
+                    numberedCopy.number = number
+                    cost *= number
+                    self.player.inventory.addItem(numberedCopy)
+                    output.say("Purchased " + str(numberedCopy) + " for " + str(cost) + " gold!")
+                self.player.inventory.removeGold(cost)
                 output.say("Now you have " + str(self.player.inventory.gold) + " gold.")

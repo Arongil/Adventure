@@ -30,3 +30,13 @@ def inputFromOptions(prompt, options, mapOption = lambda option: str(option), co
             output.say(warning)
         choice = getInput(prompt)
     return options[int(choice) - 1]
+
+def yesNo():
+    while True:
+        choice = getInput("yes/no").lower()
+        if choice == "yes":
+            return True
+        elif choice == "no":
+            return False
+        else:
+            output.say("Please enter yes or no.")
