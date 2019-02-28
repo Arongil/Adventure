@@ -18,15 +18,18 @@ class Item:
             return str(self)
         return self.name + (": " if self.number == 1 else " (" + str(self.number) + "x): ") + self.description
 
+    def equals(self, item):
+        return item.name == self.name and item.description == self.description and item.sellCost == self.sellCost and item.buyCost == self.buyCost and item.usable == self.usable
+
     # Check whether an item can stack with this and, if so, stack it. Return whether the operation was successful.
     def stack(self, item):
-        if item.name == self.name and item.description == self.description and item.sellCost == self.sellCost and item.buyCost == self.buyCost and item.usable == self.usable:
+        if self.equals(item):
             self.number += item.number
             return True
         return False
 
     def remove(self, item, amount):
-        if item.name == self.name and self.number >= amount:
+        if self.equals(item) and self.number >= amount:
             self.number -= amount
             return True
         return False
