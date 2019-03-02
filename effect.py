@@ -52,7 +52,7 @@ class HealthBuff(Effect):
             target.health = target.stats.health.getValue()
 
     def startNotification(self, target):
-        return self.name.capitalize() + ": " + target.the + "'s health is " + self.verb + " by " + output.formatNumber(abs(self.amount)) + " for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s maximum health is now " + output.formatNumber(target.stats.health.getValue()) + "."
+        return self.name.capitalize() + ": " + target.the + "'s health is " + self.verb + " by " + output.formatNumber(abs(self.amount)) + " for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s maximum health is now " + str(target.stats.health) + "."
 
 # MULTIPLICATIVE BUFFS
 
@@ -68,7 +68,7 @@ class ArmorBuff(Effect):
         self.verb = "increased" if self.amount > 0 else "reduced"
 
     def startNotification(self, target):
-        return self.name.capitalize() + ": " + target.the + "'s armor is " + self.verb + " by " + output.formatNumber(abs(100 * self.amount)) + "% for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s armor is now " + output.formatNumber(target.stats.armor.getValue()) + "."
+        return self.name.capitalize() + ": " + target.the + "'s armor is " + self.verb + " by " + output.formatNumber(abs(100 * self.amount)) + "% for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s armor is now " + str(target.stats.armor) + "."
 
 class StrengthBuff(Effect):
 
@@ -82,7 +82,7 @@ class StrengthBuff(Effect):
         self.verb = "increased" if self.amount > 0 else "reduced"
 
     def startNotification(self, target):
-        return self.name.capitalize() + ": " + target.the + "'s strength is " + self.verb + " by " + output.formatNumber(abs(100 * self.amount)) + "% for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s strength is now " + output.formatNumber(target.stats.strength.getValue()) + "."
+        return self.name.capitalize() + ": " + target.the + "'s strength is " + self.verb + " by " + output.formatNumber(abs(100 * self.amount)) + "% for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s strength is now " + str(target.stats.strength) + "."
 
 class SpiritBuff(Effect):
 
@@ -96,7 +96,7 @@ class SpiritBuff(Effect):
         self.verb = "increased" if self.amount > 0 else "reduced"
 
     def startNotification(self, target):
-        return self.name.capitalize() + ": " + target.the + "'s spirit is " + self.verb + " by " + output.formatNumber(abs(100 * self.amount)) + "% for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s spirit is now " + output.formatNumber(target.stats.spirit.getValue()) + "."
+        return self.name.capitalize() + ": " + target.the + "'s spirit is " + self.verb + " by " + output.formatNumber(abs(100 * self.amount)) + "% for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s spirit is now " + str(target.stats.spirit) + "."
 
 class CriticalChanceBuff(Effect):
 
@@ -110,7 +110,7 @@ class CriticalChanceBuff(Effect):
         self.verb = "increased" if self.amount > 0 else "reduced"
 
     def startNotification(self, target):
-        return self.name.capitalize() + ": " + target.the + "'s critical hit chance is " + self.verb + " by " + output.formatNumber(abs(100 * self.amount)) + "% for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s critical hit chance is now " + output.formatNumber(target.stats.criticalChance.getValue()) + "."
+        return self.name.capitalize() + ": " + target.the + "'s critical hit chance is " + self.verb + " by " + output.formatNumber(abs(100 * self.amount)) + "% for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s critical hit chance is now " + target.stats.criticalChance.percent() + "%."
 
 class CriticalStrikeBuff(Effect):
 
@@ -124,7 +124,7 @@ class CriticalStrikeBuff(Effect):
         self.verb = "increased" if self.amount > 0 else "reduced"
 
     def startNotification(self, target):
-        return self.name.capitalize() + ": " + target.the + "'s critical hit damage is " + self.verb + " by " + output.formatNumber(abs(100 * self.amount)) + "% for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s critical hit damage is now " + output.formatNumber(target.stats.criticalStrike.getValue()) + "."
+        return self.name.capitalize() + ": " + target.the + "'s critical hit damage is " + self.verb + " by " + output.formatNumber(abs(100 * self.amount)) + "% for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s critical hit damage is now " + str(target.stats.criticalStrike) + "."
 
 class ArmorBuffAdd(Effect):
 
@@ -138,7 +138,7 @@ class ArmorBuffAdd(Effect):
         self.verb = "increased" if self.amount > 0 else "reduced"
 
     def startNotification(self, target):
-        return self.name.capitalize() + ": " + target.the + "'s armor is " + self.verb + " by " + output.formatNumber(abs(self.amount)) + " for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s armor is now " + output.formatNumber(target.stats.armor.getValue()) + "."
+        return self.name.capitalize() + ": " + target.the + "'s armor is " + self.verb + " by " + output.formatNumber(abs(self.amount)) + " for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s armor is now " + str(target.stats.armor) + "."
 
 class StrengthBuffAdd(Effect):
 
@@ -152,7 +152,7 @@ class StrengthBuffAdd(Effect):
         self.verb = "increased" if self.amount > 0 else "reduced"
 
     def startNotification(self, target):
-        return self.name.capitalize() + ": " + target.the + "'s strength is " + self.verb + " by " + output.formatNumber(abs(self.amount)) + " for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s strength is now " + output.formatNumber(target.stats.strength.getValue()) + "."
+        return self.name.capitalize() + ": " + target.the + "'s strength is " + self.verb + " by " + output.formatNumber(abs(self.amount)) + " for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s strength is now " + str(target.stats.strength) + "."
 
 class SpiritBuffAdd(Effect):
 
@@ -166,7 +166,7 @@ class SpiritBuffAdd(Effect):
         self.verb = "increased" if self.amount > 0 else "reduced"
 
     def startNotification(self, target):
-        return self.name.capitalize() + ": the " + target.the + "'s spirit is " + self.verb + " by " + output.formatNumber(abs(self.amount)) + " for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s spirit is now " + output.formatNumber(target.stats.spirit.getValue()) + "."
+        return self.name.capitalize() + ": the " + target.the + "'s spirit is " + self.verb + " by " + output.formatNumber(abs(self.amount)) + " for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s spirit is now " + str(target.stats.spirit) + "."
 
 class CriticalChanceBuffAdd(Effect):
 
@@ -180,7 +180,7 @@ class CriticalChanceBuffAdd(Effect):
         self.verb = "increased" if self.amount > 0 else "reduced"
 
     def startNotification(self, target):
-        return self.name.capitalize() + ": " + target.the + "'s critical hit chance is " + self.verb + " by " + output.formatNumber(abs(self.amount)) + " for " + str(self.duration) + ". " + target.the.capitalize() + "'s critical hit chance is now " + output.formatNumber(target.stats.criticalChance.getValue()) + "."
+        return self.name.capitalize() + ": " + target.the + "'s critical hit chance is " + self.verb + " by " + output.formatNumber(abs(self.amount)) + " for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s critical hit chance is now " + target.stats.criticalChance.percent() + "%."
 
 class CriticalStrikeBuffAdd(Effect):
 
@@ -194,7 +194,7 @@ class CriticalStrikeBuffAdd(Effect):
         self.verb = "increased" if self.amount > 0 else "reduced"
 
     def startNotification(self, target):
-        return self.name.capitalize() + ": " + target.the + "'s critical hit damage is " + self.verb + " by " + output.formatNumber(abs(self.amount)) + " for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s critical hit damage is now " + output.formatNumber(target.stats.criticalStrike.getValue()) + "."
+        return self.name.capitalize() + ": " + target.the + "'s critical hit damage is " + self.verb + " by " + output.formatNumber(abs(self.amount)) + " for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s critical hit damage is now " + str(target.stats.criticalStrike) + "."
 
 # EFFECTS OVER TIME
 

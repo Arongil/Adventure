@@ -104,7 +104,7 @@ class Use(action.Action):
 
 class LevelBonus(action.Action):
 
-    def __init__(self, player):
+    def __init__(self, player, abilities):
         action.Action.__init__(self, "bonus", player)
         # the stats offered and their associated bonuses
         self.stats = [
@@ -123,15 +123,21 @@ class LevelBonus(action.Action):
             "critical hit chance": 0.01,
             "critical hit damage": 0.2
         }
+        self.abilities = abilities # array with abilities, descriptions, and level numbers for when to award them
 
     def activate(self):
         output.say("Which stat do you want to boost?")
         while True:
-            stat = input.inputFromOptions(self.name, self.stats, lambda stat: stat.name + " by " + str(self.bonuses[stat.name]) + ", currently at " + str(stat.getValue()) + ".")
+            stat = input.inputFromOptions(self.name, self.stats, lambda stat: stat.name + " by " + str(self.bonuses[stat.name]) + ", currently at " + str(stat) + ".")
             output.say("Are you sure you want to boost " + str(stat.name) + " by " + str(self.bonuses[stat.name]) + "?")
             if input.yesNo():
                 stat.add(self.bonuses[stat.name])
-                return
+                break
+        if len(self.abilities) > 0 and self.player.level == self.abilities[0][2]: # check if level is correct
+            output.exclaim("You learn a new ability: " + str(self.abilities[0][0]).upper() + "!")
+            output.declare(self.abilities[0][1]) # skill description
+            self.player.abilities.append(self.abilities[0][0])
+            self.abilities.pop(0)
 
 class RestHeal(action.Action):
 

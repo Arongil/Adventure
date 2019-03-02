@@ -59,8 +59,8 @@ class GraglisTheGremlin(monster.Monster):
     def __init__(self):
         def voodooFetishProc(wearer, target):
             if random.random() < 0.05:
-                output.say("Your voodoo fetish begins wailing softly, disorienting " + target.the + ".")
-                target.addEffect( effect.StrengthBuffAdd("voodoo stun", 2, -4) )
+                output.say(wearer.the.capitalize() + "'s voodoo fetish begins wailing softly, disorienting " + target.the + ".")
+                target.addEffect( effect.StrengthBuff("voodoo stun", 2, -0.2) )
 
         self.voodooFetish = gear.Trinket("voodoo fetish", "the force that governs voodoo is twisted and vague... only strange creatures commune with it well", 29, 99, lambda target: target.stats.add(criticalChance=0.1), lambda target: target.stats.add(criticalChance=-0.1), voodooFetishProc)
         monster.Monster.__init__(self, "Graglis the Gremlin", 80, loot.Loot("Graglis the Gremlin", 16, 140, [
@@ -283,7 +283,7 @@ class AricneaTheSly(monster.Monster):
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
             [ability.Ability("stab", 0, self, lambda ablty, target: ability.damage(ablty, target, 11, 19)), 0.6],
             [ability.Ability("fan of knives", 0, self, lambda ablty, target: ability.damage(ablty, target, 18, 26)), 0.2],
-            [ability.Ability("draw shadows", 3, self, lambda ablty, target: ablty.caster.addEffect( effect.ArmorBuffAdd("draw shadows", 3, 18) )), 0.2]
+            [ability.Ability("draw shadows", 3, self, lambda ablty, target: ablty.caster.addEffect( effect.ArmorBuff("draw shadows", 3, 0.8) )), 0.2]
         ], unique=True)
         self.gear.equip(self.sting)
         self.calledDogs = False
@@ -297,11 +297,13 @@ class AricneaTheSly(monster.Monster):
             output.bar()
             output.exclaim("Ha! You insect think to best me? Finish the swine, dogs!")
             output.bar()
+            globals.player.update()
             self.dogFight.activate()
+            globals.player.update()
             self.dogFight.activate()
             output.exclaim("Aaaah! You shall not defeat the forces of the undead... we are eternal!")
             self.addEffect( effect.HealOverTime("glory for the undead", 2, 30, 50) )
-            self.addEffect( effect.StrengthBuffAdd("battle rage", 9, 8) )
+            self.addEffect( effect.StrengthBuff("battle rage", 9, 0.6) )
         else:
             self.abilities.getOption(lambda ability: not ability.onCooldown()).activate(target)
 
@@ -351,7 +353,7 @@ class UnholyOoze(monster.Monster):
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
             [ability.Ability("spit slime", 0, self, lambda ablty, target: ability.damage(ablty, target, 6, 10)), 0.7],
-            [ability.Ability("jellification", 3, self, lambda ablty, target: ablty.caster.addEffect( effect.ArmorBuffAdd("jellification", 2, 40) )), 0.3]
+            [ability.Ability("jellification", 3, self, lambda ablty, target: ablty.caster.addEffect( effect.ArmorBuff("jellification", 2, 1.4) )), 0.3]
         ])
         self.size = 3
 
