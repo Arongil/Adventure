@@ -1,3 +1,4 @@
+import copy
 import output
 import frequencyList as fList
 import interaction
@@ -21,7 +22,7 @@ class Loot(interaction.Interaction):
         self.player.inventory.addGold(self.gold)
         self.player.addExperience(self.experience)
         if len(self.items) > 0:
-            drop = self.items.getOption()
+            drop = copy.deepcopy(self.items.getOption())
             if not isinstance(drop, item.Nothing):
                 self.player.inventory.addItem(drop)
                 output.exclaim("You receive " + drop.name + " from " + self.name + ".")

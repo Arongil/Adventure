@@ -1,4 +1,5 @@
 from random import randint
+import copy
 import input
 import output
 import frequencyList as fList
@@ -176,7 +177,7 @@ class FindItem(action.Action):
         self.items = fList.FrequencyList(items)
 
     def activate(self):
-        drop = self.items.getOption()
+        drop = copy.deepcopy(self.items.getOption())
         output.exclaim(self.message(drop))
         self.player.inventory.addItem(drop)
 

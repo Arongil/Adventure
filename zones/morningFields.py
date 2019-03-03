@@ -29,7 +29,7 @@ class Wolf(monster.Monster):
     def __init__(self):
         monster.Monster.__init__(self, "wolf", 40, loot.Loot("the wolf", 2, 20, [
                 [item.Nothing(), 0.7],
-                [item.Item("lean wolf flank", "its owner must not have had enough to eat", 2, 9), 0.25],
+                [potions.HealthPotion("lean wolf flank", "its owner must not have had enough to eat", 2, 9, 6), 0.25],
                 [gear.Gloves("torn wolfhide gloves", "the coarse fabric seems vaguely glovelike", 8, 26, lambda creature: creature.stats.add(armor=2), lambda creature: creature.stats.add(armor=-2)), 0.05]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
