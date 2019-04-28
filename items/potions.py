@@ -13,6 +13,6 @@ class HealthPotion(item.UsableItem):
         if target.health > target.stats.health.getValue():
             target.health = target.stats.health.getValue()
         if self.amount > 0:
-            output.proclaim("The " + str(target) + " recovers " + str(self.amount) + " health after drinking " + self.name + ". You now have " + output.formatNumber(target.health) + "/" + str(target.stats.health.getValue()) + " health.")
+            output.proclaim("The " + str(target) + " recovers " + str(self.amount) + " health after using " + self.name + ". You now have " + output.formatNumber(target.health) + "/" + str(target.stats.health.getValue()) + " health.")
         elif self.amount < 0:
-            output.proclaim("The " + str(target) + " is drained " + str(self.amount) + " health after drinking " + self.name + ". You now have " + output.formatNumber(target.health) + "/" + str(target.stats.health.getValue()) + " health.")
+            output.proclaim("The " + str(target) + " is drained " + str(self.amount) + " health after using " + self.name + ". You now have " + output.formatNumber(target.health) + "/" + str(target.stats.health.getValue()) + " health.")

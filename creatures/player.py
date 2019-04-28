@@ -12,6 +12,11 @@ class Player(creature.Creature):
         creature.Creature.__init__(self, "player", health)
         self.location = location # the player's actions derive from its location
 
+        self.settings = {
+            "auto-rest": False,
+            "auto-scavenge": False
+        }
+
         # baseActions are actions the player can always take.
         self.baseActions = [
             actions.Menu(self),
@@ -59,6 +64,34 @@ class Player(creature.Creature):
         if not self.alive:
             return actions.Nothing()
         return self.location.getInteraction()
+    
+    def act(self, action = None):
+        if self.alive == False:
+            return
+        self.update()
+        if action == None:
+            input.inputFromOptions("turn", self.actions).activate()
+        else:
+            action.activate()
+
+    def interact(self):
+        if self.alive == False:
+            return
+        interaction = self.getInteraction()
+        if isinstance(interaction, actions.Nothing):
+            output.bar()
+            return False
+        interaction.activate()
+        output.bar()
+        return True
+
+    # Call at the end of an action to attempt automatically taking another if there is no interaction.
+    def attemptAutoAct(self, action):
+        if self.interact(): # If there is an interaction that interrupts the action, cancel and recover.
+            self.act()
+        else: # Otherwise, execute the action.
+            self.act(action)
+
 
     def changeLocation(self, newLocation):
         self.location.leave()

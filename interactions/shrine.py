@@ -44,9 +44,9 @@ class StatShrine(Shrine):
     def addBonus(self):
         output.say("Which stat do you want to boost for " + str(self.duration) + " turns?")
         while True:
-            stat = input.inputFromOptions("shrine", self.stats, lambda stat: stat.name + " by " + str(self.amounts[self.stats.index(stat)]) + ", currently at " + str(stat.getValue()) + ".")
+            stat = input.inputFromOptions("shrine", self.stats, lambda stat: stat.name + " by " + output.formatNumber(self.amounts[self.stats.index(stat)]) + ", currently at " + str(stat) + ".")
             index = self.stats.index(stat)
-            output.say("Are you sure you want to boost " + stat.name + " by " + str(self.amounts[index]) + " for " + str(self.duration) + " turns?")
+            output.say("Are you sure you want to boost " + stat.name + " by " + output.formatNumber(self.amounts[index]) + " for " + str(self.duration) + " turns?")
             if input.yesNo():
                 self.player.addEffect( self.buffs[index]("shrine bonus", self.duration, self.amounts[index]) )
                 return

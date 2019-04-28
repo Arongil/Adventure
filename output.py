@@ -31,15 +31,3 @@ def formatNumber(n):
 def outputList(options, mapOption = lambda option: str(option)):
     for i in range(len(options)):
         say("  " + str(i + 1) + ": " + mapOption(options[i]))
-
-def help():
-    output("Welcome to Adventure!")
-    output("Type 'help' to bring up this message again.")
-    output("Commands:", False, True)
-    output("help", True)
-    output("inventory", True)
-    output("town", True)
-    output("scavenge", True)
-    output("rest", True)
-    output("use", True)
-    output("Beware of monsters... they prowl the shadows.", False, True)

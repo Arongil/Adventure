@@ -11,7 +11,5 @@ class Game:
     
     def start(self):
         while self.player.alive:
-            self.player.update()
-            input.inputFromOptions("turn", self.player.actions).activate()
-            self.player.getInteraction().activate()
-            output.bar()
+            self.player.act()
+            self.player.interact()

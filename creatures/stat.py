@@ -10,10 +10,10 @@ class Stat:
         self.multiplication = 1
 
     def __str__(self):
-        return output.formatNumber( (self.value + self.addition) * self.multiplication )
+        return output.formatNumber( (self.value + self.base + self.addition) * self.multiplication - self.base )
 
     def percent(self):
-        return output.formatNumber( (self.value + self.addition) * self.multiplication * 100)
+        return output.formatNumber( ( (self.value + self.base + self.addition) * self.multiplication - self.base ) * 100 )
 
     def getValue(self):
         return (self.value + self.base + self.addition) * self.multiplication

@@ -24,6 +24,20 @@ class Quit(action.Action):
             self.player.alive = False
             output.exclaim("Thank you for playing!")
 
+class Settings(action.Action):
+
+    def __init__(self, player):
+        action.Action.__init__(self, "settings", player)
+
+    def activate(self):
+        output.say("Toggle any of the following settings.")
+        while True:
+            option = input.inputFromOptions("option", ["back"] + list(self.player.settings), lambda setting: setting if setting == "back" else str(setting) + " = " + str(self.player.settings[setting]))
+            if option == "back":
+                break
+            self.player.settings[option] = not self.player.settings[option]
+            output.proclaim(str(option).capitalize() + " toggled to " + str(self.player.settings[option]) + ".")
+
 class Stats(action.Action):
 
     def __init__(self, player):
@@ -69,8 +83,9 @@ class Menu(action.Action):
         action.Action.__init__(self, "menu", player)
         self.options = [
             Nothing("back"),
-            Stats(self.player),
             Taxi(self.player, "", []),
+            Stats(self.player),
+            Settings(self.player),
             Quit(self.player)
         ]
 
@@ -150,10 +165,14 @@ class RestHeal(action.Action):
     def activate(self):
         amount = self.player.recoverHealth(randint(self.lowerBound, self.upperBound))
         if self.player.health == self.player.stats.health.getValue():
-            output.exclaim("You are at full health after resting!")
+            output.declare("You are at full health after resting!")
         else:
-            output.exclaim("You recover " + output.formatNumber(amount) + " health from resting. You now have " + output.formatNumber(self.player.health) + "/" + str(self.player.stats.health.getValue()) + " health.")
-    
+            output.declare("You recover " + output.formatNumber(amount) + " health from resting. You now have " + output.formatNumber(self.player.health) + "/" + str(self.player.stats.health.getValue()) + " health.")
+        # check player setting: auto-rest
+        if self.player.settings["auto-rest"]:
+            if self.player.health < self.player.stats.health.getValue():
+                self.player.attemptAutoAct(self)
+ 
 class ScavengeGold(action.Action):
 
     def __init__(self, player, lowerBound, upperBound):
@@ -165,9 +184,12 @@ class ScavengeGold(action.Action):
         amount = randint(self.lowerBound, self.upperBound)
         self.player.inventory.addGold(amount)
         if amount == 0:
-            output.exclaim("You find nothing while scavenging.")
+            output.declare("You find nothing while scavenging.")
         else:
-            output.exclaim("You find " + output.formatNumber(amount) + " gold while scavenging.")
+            output.declare("You find " + output.formatNumber(amount) + " gold while scavenging.")
+        # check player setting: auto-scavenge
+        if self.player.settings["auto-scavenge"]:
+            self.player.attemptAutoAct(self)
 
 class FindItem(action.Action):
 
