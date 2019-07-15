@@ -155,6 +155,18 @@ class SorcererOutcast(monster.Monster):
             [ability.Ability("icy shield", 4, self, lambda ablty, target: ablty.caster.addEffect( effect.ArmorBuff("icy shield", 3, 1) )), 0.2]
         ], armor=4)
 
+class DoomPanda(monster.Monster):
+
+    def __init__(self):
+        monster.Monster.__init__(self, "doom panda", 500, loot.Loot("the doom panda", 260, 1, [
+                [item.UsableItem("big black potion", "this is undoubtedly some bad stuff", 1, 2, lambda target: target.addEffect( effect.StrengthBuff("strength of a doom panda", 8, 30) )), 0.5],
+                [gear.Weapon("The Black Scythe", "the sword of the doom panda", 1, 2, lambda target: target.stats.add(strength=10, criticalChance=0.1), lambda target: target.stats.add(strength=-10, criticalChance=-0.1)), 0.5]
+            ]), [
+            # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
+            [ability.Ability("cuddle", 0, self, lambda ablty, target: ability.heal(ablty, target, 1, 5)), 0.9],
+            [ability.Ability("DOOOOOOOOOOM", 6, self, lambda ablty, target: ability.damage(ablty, target, 80, 100)), 0.1],
+        ], armor=16, criticalChance=0)
+
 def getTheSilentForest():
     def enter():
         output.proclaim("The Silent Forest: Great oaks sway endlessly to the southerly winds. The air's oppression is lifted but briefly at the occasional rustle. Trees obscure the view to Trainee Valley.")
@@ -164,8 +176,9 @@ def getTheSilentForest():
     def getMonster():
         return fList.FrequencyList([
             [ProwlingFox(), 0.4],
-            [Owl(), 0.4],
-            [SorcererOutcast(), 0.2]
+            [Owl(), 0.39],
+            [SorcererOutcast(), 0.2],
+            [DoomPanda(), 0.01]
         ]).getOption()
 
     theSilentForestActions = [
@@ -225,6 +238,10 @@ class Ghoul(monster.Monster):
             [ability.Ability("mindless maul", 0, self, lambda ablty, target: ability.damage(ablty, target, 9, 18)), 0.7],
             [ability.Ability("putrid breath", 5, self, lambda ablty, target: target.addEffect( effect.ArmorBuff("putrid breath", 4, -0.3) )), 0.3]
         ])
+
+#################### W # A # R # N # I # N # G ####################
+LJN = gear.Weapon("Laker-Justin Nunchucks", "You can probably guess the words on each nunchuck", 1000, 1001, lambda target: target.stats.add(strength=1000000, criticalChance=1, criticalStrike=15, armor=1000), lambda target: target.stats.add(strength=-1000000, criticalChance=-1, criticalStrike=-15, armor=-1000))
+###################### D # A # N # G # E # R ######################
 
 def getSkeletonCave():
     def enter():
