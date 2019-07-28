@@ -59,12 +59,12 @@ class Player(creature.Creature):
                 i.changeTaxi(self.location.taxi)
                 return True
         return False
-    
+
     def getInteraction(self):
         if not self.alive:
             return actions.Nothing()
         return self.location.getInteraction()
-    
+
     def act(self, action = None):
         if self.alive == False:
             return
@@ -77,11 +77,15 @@ class Player(creature.Creature):
     def interact(self):
         if self.alive == False:
             return
+        # Make sure the player is up to date.
+        self.updateAttributes()
         interaction = self.getInteraction()
         if isinstance(interaction, actions.Nothing):
             output.bar()
             return False
         interaction.activate()
+        # Make sure the player is up to date.
+        self.updateAttributes()
         output.bar()
         return True
 
@@ -102,11 +106,13 @@ class Player(creature.Creature):
     def inspect(self):
         return "You have " + output.formatNumber(self.health) + "/" + str(self.stats.health) + " health."
 
+    def updateAttributes(self):
+        while self.level < self.maxLevel and self.experience >= self.levelUpExperience[self.level - 1]:
+            self.levelUp()
+
     def addExperience(self, amount):
         if self.level < self.maxLevel:
             self.experience += amount
-            while self.level < self.maxLevel and self.experience >= self.levelUpExperience[self.level - 1]:
-                self.levelUp()
 
     def levelUp(self):
         self.experience -= self.levelUpExperience[self.level - 1]

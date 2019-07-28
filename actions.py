@@ -49,6 +49,18 @@ class Stats(action.Action):
         output.say(str(self.player.stats))
         output.say("---------------------------------------")
 
+class Inventory(action.Action):
+
+    def __init__(self, player):
+        action.Action.__init__(self, "inventory", player)
+
+    def activate(self):
+        output.proclaim("")
+        output.say("-------------- Inventory --------------")
+        output.proclaim("You have " + str(self.player.inventory.gold) + " gold.\n")
+        output.outputList(self.player.inventory.items, lambda i: str(i) + ": " + str(i.description))
+        output.say("---------------------------------------")
+
 class Taxi(action.Action):
 
     def __init__(self, player, greeting, locations):
@@ -85,6 +97,7 @@ class Menu(action.Action):
             Nothing("back"),
             Taxi(self.player, "", []),
             Stats(self.player),
+            Inventory(self.player),
             Settings(self.player),
             Quit(self.player)
         ]
@@ -95,7 +108,7 @@ class Menu(action.Action):
                 self.options[i] = taxi
                 return True
         return False
-    
+
     def activate(self):
         input.inputFromOptions("menu", self.options).activate()
 
@@ -172,7 +185,7 @@ class RestHeal(action.Action):
         if self.player.settings["auto-rest"]:
             if self.player.health < self.player.stats.health.getValue():
                 self.player.attemptAutoAct(self)
- 
+
 class ScavengeGold(action.Action):
 
     def __init__(self, player, lowerBound, upperBound):
@@ -240,3 +253,15 @@ class Shop(action.Action):
             self.shops[0].activate()
         else:
             input.inputFromOptions("visit", self.shops).activate()
+
+class Talk(action.Action):
+
+    def __init__(self, player, npcs):
+        action.Action.__init__(self, "talk", player)
+        self.npcs = npcs
+
+    def activate(self):
+        choice = input.inputFromOptions("talk", ["back"] + self.npcs, lambda npc: npc if npc == "back" else str(npc.getName()))
+        if choice == "back":
+            return
+        choice.activate()

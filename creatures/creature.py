@@ -33,6 +33,14 @@ class Creature:
     def the(self):
         return ("" if self.unique else "the ") + str(self)
 
+    # returns whether the creature has any number of items in their inventory, and removes them if they do
+    def checkAndRemove(self, itemName, number):
+        return self.inventory.checkAndRemove(itemName, number)
+
+    # returns the same as checkAndRemove, but doesn't remove
+    def has(self, itemName, number):
+        return self.inventory.has(itemName, number)
+
     def dealDamage(self, target, damage):
         amount = self.stats.damageDealt(damage)
         return target.takeDamage(amount)
@@ -51,7 +59,7 @@ class Creature:
 
     def addEffect(self, effect):
         self.effects.append(effect)
-    
+
     def removeEffect(self, effect):
         self.effects.remove(effect)
 

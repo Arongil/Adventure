@@ -9,6 +9,8 @@ import interactions.shrine as shrine
 import creatures.monster as monster
 import creatures.gear as gear
 import items.potions as potions
+import npcs.npc as npc
+import npcs.quest as quest
 import location
 import actions
 import ability
@@ -42,8 +44,8 @@ class DrunkenTrainee(monster.Monster):
 
     def __init__(self):
         monster.Monster.__init__(self, "drunken trainee", 60, loot.Loot("the drunken trainee", 5, 30, [
-                [item.Nothing(), 0.7],
-                [item.UsableItem("cheap whiskey", "it's nearly empty", 5, 19, lambda target: target.addEffect( effect.DamageOverTime("intoxication", 3, 1, 2) )), 0.3]
+                [item.Nothing(), 0.4],
+                [item.UsableItem("cheap whiskey", "it's nearly empty", 5, 19, lambda target: target.addEffect( effect.DamageOverTime("intoxication", 3, 1, 2) )), 0.6]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
             [ability.Ability("charge", 0, self, lambda ablty, target: ability.damage(ablty, target, 6, 10)), 0.5],
@@ -241,6 +243,8 @@ class Ghoul(monster.Monster):
 
 #################### W # A # R # N # I # N # G ####################
 LJN = gear.Weapon("Laker-Justin Nunchucks", "You can probably guess the words on each nunchuck", 1000, 1001, lambda target: target.stats.add(strength=1000000, criticalChance=1, criticalStrike=15, armor=1000), lambda target: target.stats.add(strength=-1000000, criticalChance=-1, criticalStrike=-15, armor=-1000))
+if globals.debug:
+    globals.player.inventory.addItem(LJN)
 ###################### D # A # N # G # E # R ######################
 
 def getSkeletonCave():
@@ -262,7 +266,6 @@ def getSkeletonCave():
             [actions.ScavengeGold(globals.player, 2, 6), 0.9],
             [actions.FindItem(globals.player, lambda drop: "While exploring the gloomy cave, you stumble across an small iron chest. You find " + str(drop) + ".", [
                 [potions.HealthPotion("health potion", "a ghoul might have taken a swig", 14, 49, 35), 0.6],
-                [item.Item("undead invasion plans", "someone at Fort Morning would want to see this", 9, 99), 0.3, True], # the True signifies that this is a unique drop, i.e. it can only ever drop once
                 [gear.Trinket("misplaced femur", "where could its owner be?", 19, 59, lambda target: target.stats.add(health=20), lambda target: target.stats.add(health=-20)), 0.1]]), 0.1]
         ])
     ]
@@ -295,8 +298,9 @@ class AricneaTheSly(monster.Monster):
 
         self.sting = gear.Weapon("Sting, Bone Reaper", "Aricnea's blade pulses with an ineffable energy", 89, 299, lambda target: target.stats.add(strength=12, criticalStrike=0.8), lambda target: target.stats.add(strength=-12, criticalStrike=-0.8), stingProc)
         monster.Monster.__init__(self, "Aricnea the Sly", 220, loot.Loot("Aricnea the Sly", 38, 1460, [
+                [item.Item("undead invasion plans", "someone at Fort Morning would want to see this", 9, 99), 1],
                 [self.sting, 1]
-            ]), [
+            ], True), [ # the True signifies Aricnea will drop all items in his loot table, every time.
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
             [ability.Ability("stab", 0, self, lambda ablty, target: ability.damage(ablty, target, 11, 19)), 0.6],
             [ability.Ability("fan of knives", 0, self, lambda ablty, target: ability.damage(ablty, target, 18, 26)), 0.2],
@@ -383,6 +387,35 @@ class UnholyOoze(monster.Monster):
             self.health = self.stats.health.getValue()
             output.proclaim("The unholy ooze sheds a layer of goo and rises again!")
 
+captainJorna = npc.NPC("Captain Jorna", "Fort Morning never pays its hardest workers enough. They give me a pittance, I tell you! It's barely enough to buy rations and drink.", [
+    quest.Quest(
+        "Drunkards and Me",
+        "The trainees are all out staggering and drunk at this time of year, trampling wildflowers and scaring away the rabbits. I don't get paid enough to go and round them up, of course. But I could probably figure something out for you if you went and taught them a lesson.\n\nThe students aren't rich either. Bring me three of their bottles of cheap whiskey to prove you've done your job, will you?",
+        "Do you have the three bottles of whiskey yet? I'm getting jittery waiting.",
+        "Wonderful! You have the whiskey right? Ah, here, perfect.\n\nAnd your compensation, how could I forget? All right, now you be off. Thanks for your help and all.",
+        lambda player: player.checkAndRemove("cheap whiskey", 3),
+        loot.Loot("Captain Jorna", 40, 600, [
+            [item.UsableItem("mysterious box", "open it!", 1, 4, lambda target: target.inventory.addItem(
+                item.UsableItem("smaller mysterious box", "now you have to see what's inside", 1, 3, lambda target: target.inventory.addItem(
+                    item.UsableItem("tiny mysterious box", "russian dolls confirmed", 1, 2, lambda target: target.inventory.addItem(
+                        item.UsableItem("miniscule flask", "there's hardly a drop of liquid in it", 1, 1, lambda target: target.addEffect( effect.SpiritBuff("drunken", 2, 4) ))
+                    ))
+                ))
+            )), 1]
+        ], True),
+        lambda player: True
+    ), quest.Quest(
+        "Invasion",
+        "", # The quest is only available once the player has the required item to complete it.
+        "",
+        "You found an invasion map, eh? Let me see what we have coming at us.\n\n*Captain Jorna scans the torn page. Her eyes widen halfway through.*\n\nThe undead plan to come tonight. They have a northern siege engine, too, by the looks of this diagram. Thank you for bringing me this.",
+        lambda player: player.checkAndRemove("undead invasion plans", 1),
+        loot.Loot("Captain Jorna", 80, 1200, []),
+        lambda player: player.has("undead invasion plans", 1),
+        True # the True here signifies that this quest can jump straight to completion if the condition is satisfied, which it will be if the player is seeing the quest
+    )
+])
+
 morningWares = shop.Shop("Morning Wares", "Welcome to Morning Wares, traveller. We carry all manner of artifacts and armor.", [
     potions.HealthPotion("lesser health potion", "better than resting", 6, 19, 20),
     potions.HealthPotion("health potion", "an over-the-counter prescription for all dying heroes", 9, 29, 30),
@@ -412,6 +445,7 @@ def getFortMorning():
         actions.Scavenge(globals.player, [
             [actions.ScavengeGold(globals.player, 0, 3), 1]
         ]),
+        actions.Talk(globals.player, [captainJorna]),
         actions.Shop(globals.player, [morningWares, villageArmory])
     ]
     fortMorningInteractions = [
@@ -429,14 +463,14 @@ dampLair = getDampLair()
 fortMorning = getFortMorning()
 
 # Add connections between locations. It's always free to stay put.
-################ UNLOCK ZONES BY LEVEL AND GOLD
-traineeValley.setTaxi(actions.Taxi(globals.player, "Hello, " + str(globals.player) + ". I hear you'd like to travel. What can I do for you?", [[traineeValley, 0], [fortMorning, 49], [theSilentForest, 99]]))
+# TAXI STRATEGY: keep prices low so players are motivated to do quests that require travel. Players are implicitly motivated to not travel to zones out of their level range, where the monsters could easily kill them.
+traineeValley.setTaxi(actions.Taxi(globals.player, "Hello, " + str(globals.player) + ". I hear you'd like to travel. What can I do for you?", [[traineeValley, 0], [fortMorning, 4], [theSilentForest, 9]]))
 traineeValley.interactions.add(actions.OfferLocationChange(globals.player, "A merchant's caravan approaches you. Its leader asks whether you want a ride to Fort Morning, where they are heading to sell western fish. Do you want to travel with them?", [fortMorning]), 0.01)
 
-theSilentForest.setTaxi(actions.Taxi(globals.player, "We must tread cautiously in these woods, " + str(globals.player) + ". If you need transit, I may be able to aid you. Where do you wish to travel?", [[theSilentForest, 0], [traineeValley, 49]]))
+theSilentForest.setTaxi(actions.Taxi(globals.player, "We must tread cautiously in these woods, " + str(globals.player) + ". If you need transit, I may be able to aid you. Where do you wish to travel?", [[theSilentForest, 0], [traineeValley, 9]]))
 theSilentForest.interactions.add(actions.OfferLocationChange(globals.player, "You spy a cave behind a crooked, dead tree. A faint clicking can be heard from within. Do you want to enter the cave?", [skeletonCave]), 0.015)
 skeletonCave.setTaxi(actions.Taxi(globals.player, "Do you want to retrace your steps and leave the dark cave?", [[skeletonCave, 0], [theSilentForest, 0]]))
 skeletonCave.interactions.add(actions.OfferLocationChange(globals.player, "An ominous darkness makes you shiver. In the distance, you see a large cavern occupied by a towering skeleton with a blue glowing sword. Do you want to enter the Damp Lair?", [dampLair]), 0.04, True)
 dampLair.setTaxi(actions.Taxi(globals.player, "You see a soft beam of light faintly in the distance. If you follow it, you'll make your way out of the skeleton cave. Do you want to leave?", [[dampLair, 0], [theSilentForest, 0]]))
 
-fortMorning.setTaxi(actions.Taxi(globals.player, "If you wish to travel, sir, then there's no better than the Fort Morning Coach Company. Where to?", [[fortMorning, 0], [traineeValley, 49]]))
+fortMorning.setTaxi(actions.Taxi(globals.player, "If you wish to travel, sir, then there's no better than the Fort Morning Coach Company. Where to?", [[fortMorning, 0], [traineeValley, 4]]))

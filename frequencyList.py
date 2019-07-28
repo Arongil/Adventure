@@ -6,7 +6,7 @@ class FrequencyList:
         self.options = options # options is a 2 by n array with the option and the chance: [["walk", 0.4], ["run", 0.6]]
         # options are automatically normalized so the total probability is 1
         self.normalize()
-    
+
     def __len__(self):
         return len(self.options)
 
@@ -19,10 +19,16 @@ class FrequencyList:
             total += i[1]
         for i in range(len(self.options)):
             self.options[i][1] /= total
-    
+
     def add(self, option, chance, unique = False):
         self.options.append([option, chance, unique])
         self.normalize()
+
+    def getAll(self):
+        options = []
+        for i in self.options:
+            options.append(i[0])
+        return options
 
     # A condition may be satisfied that the output must satisfy. Assume that at least one output satisfies the condition.
     def getOption(self, condition = lambda option: True):
