@@ -145,11 +145,11 @@ class LevelBonus(action.Action):
             self.player.stats.criticalStrike
         ]
         self.bonuses = {
-            "health": 5,
+            "health": 10,
             "armor": 2,
             "strength": 2,
             "spirit": 2,
-            "critical hit chance": 0.01,
+            "critical hit chance": 0.02,
             "critical hit damage": 0.2
         }
         self.abilities = abilities # array with abilities, descriptions, and level numbers for when to award them

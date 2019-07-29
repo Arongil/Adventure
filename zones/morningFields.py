@@ -157,6 +157,19 @@ class SorcererOutcast(monster.Monster):
             [ability.Ability("icy shield", 4, self, lambda ablty, target: ablty.caster.addEffect( effect.ArmorBuff("icy shield", 3, 1) )), 0.2]
         ], armor=4)
 
+class SkeletonScout(monster.Monster):
+
+    def __init__(self):
+        monster.Monster.__init__(self, "skeleton scout", 60, loot.Loot("the skeleton scout", 8, 140, [
+                [item.Nothing(), 0.4],
+                [item.Item("cracked bone", "dirty gray with a scratch along its middle", 3, 9), 0.6]
+            ]), [
+            # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
+            [ability.Ability("charge", 999, self, lambda ablty, target: ability.damage(ablty, target, 9, 16)), 999],
+            [ability.Ability("slash", 0, self, lambda ablty, target: ability.damage(ablty, target, 6, 15)), 0.8],
+            [ability.Ability("fuse bone", 4, self, lambda ablty, target: ability.heal(ablty, target, 18, 30)), 0.2]
+        ])
+
 class DoomPanda(monster.Monster):
 
     def __init__(self):
@@ -178,8 +191,9 @@ def getTheSilentForest():
     def getMonster():
         return fList.FrequencyList([
             [ProwlingFox(), 0.4],
-            [Owl(), 0.39],
+            [Owl(), 0.35],
             [SorcererOutcast(), 0.2],
+            [SkeletonScout(), 0.04],
             [DoomPanda(), 0.01]
         ]).getOption()
 
@@ -205,8 +219,8 @@ class SkeletonWarrior(monster.Monster):
 
     def __init__(self):
         monster.Monster.__init__(self, "skeleton warrior", 60, loot.Loot("the skeleton warrior", 4, 80, [
-                [item.Nothing(), 0.8],
-                [item.Item("cracked bone", "dirty gray with a scratch along its middle", 3, 9), 0.2]
+                [item.Nothing(), 0.6],
+                [item.Item("cracked bone", "dirty gray with a scratch along its middle", 3, 9), 0.4]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
             [ability.Ability("charge", 999, self, lambda ablty, target: ability.damage(ablty, target, 9, 16)), 999],
@@ -218,7 +232,8 @@ class SkeletonArcher(monster.Monster):
 
     def __init__(self):
         monster.Monster.__init__(self, "skeleton archer", 60, loot.Loot("the skeleton archer", 4, 80, [
-                [item.Nothing(), 0.7],
+                [item.Nothing(), 0.4],
+                [item.Item("cracked bone", "dirty gray with a scratch along its middle", 3, 9), 0.3],
                 [item.Item("unfeathered arrow", "its tip seems to be made of tempered brown clay", 4, 6), 0.2],
                 [gear.Boots("crude sabatons", "probably held together with mud and bone marrow", 15, 44, lambda target: target.stats.add(armor=2, criticalChance=0.02), lambda target: target.stats.add(armor=-2, criticalChance=-0.02)), 0.1]
             ]), [
@@ -387,10 +402,16 @@ class UnholyOoze(monster.Monster):
             self.health = self.stats.health.getValue()
             output.proclaim("The unholy ooze sheds a layer of goo and rises again!")
 
+
+def boozeStainedWarglaivesProc(wearer, target):
+    if random.random() < 0.15:
+        target.addEffect( effect.DamageOverTime("contagious intoxication", 3, 4, 6) )
+boozeStainedWarglaives = gear.Weapon("booze-stained warglaives", "they seriously smell like cheap whisky, but hey, they're warglaives!", 19, 31, lambda target: target.stats.add(armor=6, health=15), lambda target: target.stats.add(armor=-6, health=-15), boozeStainedWarglaivesProc)
+
 captainJorna = npc.NPC("Captain Jorna", "Fort Morning never pays its hardest workers enough. They give me a pittance, I tell you! It's barely enough to buy rations and drink.", [
     quest.Quest(
         "Drunkards and Me",
-        "The trainees are all out staggering and drunk at this time of year, trampling wildflowers and scaring away the rabbits. I don't get paid enough to go and round them up, of course. But I could probably figure something out for you if you went and taught them a lesson.\n\nThe students aren't rich either. Bring me three of their bottles of cheap whiskey to prove you've done your job, will you?",
+        "The trainees are all out staggering and drunk at this time of year, trampling wildflowers and scaring away the rabbits. I don't get paid enough to go and round them up, of course. But I could probably figure something out for you if you went and taught them a lesson.\n\nGo to trainee valley and bring me three of their bottles of cheap whiskey to prove you've done your job, will you?",
         "Do you have the three bottles of whiskey yet? I'm getting jittery waiting.",
         "Wonderful! You have the whiskey right? Ah, here, perfect.\n\nAnd your compensation, how could I forget? All right, now you be off. Thanks for your help and all.",
         lambda player: player.checkAndRemove("cheap whiskey", 3),
@@ -405,8 +426,20 @@ captainJorna = npc.NPC("Captain Jorna", "Fort Morning never pays its hardest wor
         ], True),
         lambda player: True
     ), quest.Quest(
+        "The Bold Undead",
+        "The skeletons are starting to form in larger groups in the Silent Forest. All my trainees are drunk, as you know, so I think we'll have to settle for you and your meager skills.\n\nThe skeletons will spare you no mercy, adventurer. Bring your strongest armor, and purchase health potions from the town shop to prepare yourself.\n\nGo to the Silent Forest and find the Skeleton Cave. From there, bring me four cracked bones from the skeletons to prove your deeds and worth.",
+        "Have you killed them skellers yetters? I'm sober fur suuure, why doo you ask?",
+        "Niiiice jooob. Speeeaking o' which, do you haaave aaany cheap whiiisky fooor meee?\n\nOh, I waaas supppooooosed to give yooou somethin'. Okay, then, here yooou aaare. Now gooo awaaaay yooaauu nincompoop.",
+        lambda player: player.checkAndRemove("cracked bone", 4),
+        loot.Loot("Captain Jorna", 60, 1000, [
+            [gear.Chest("booze-stained cuirass", "all drunken trainees are required to wear it for their weekly shame sessions, but it's surprisingly strong", 23, 54, lambda target: target.stats.add(armor=6, health=15), lambda target: target.stats.add(armor=-6, health=-15)), 1],
+            [potions.HealthPotion("stale bread", "there's already a bite missing...", 1, 9, 12), 1],
+            [boozeStainedWarglaives, 1]
+        ], True),
+        lambda player: player.level >= 5
+    ), quest.Quest(
         "Invasion",
-        "", # The quest is only available once the player has the required item to complete it.
+        "", # This quest is only visible if it's already completed, so no need for original text.
         "",
         "You found an invasion map, eh? Let me see what we have coming at us.\n\n*Captain Jorna scans the torn page. Her eyes widen halfway through.*\n\nThe undead plan to come tonight. They have a northern siege engine, too, by the looks of this diagram. Thank you for bringing me this.",
         lambda player: player.checkAndRemove("undead invasion plans", 1),
