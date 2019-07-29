@@ -135,7 +135,7 @@ class Owl(monster.Monster):
     def __init__(self):
         monster.Monster.__init__(self, "owl", 30, loot.Loot("the owl", 2, 40, [
                 [item.Nothing(), 0.8],
-                [item.Item("feather", "", 1, 4), 0.2]
+                [item.Item("feather", "it's definitely a feather", 1, 4), 0.2]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
             [ability.Ability("peck", 0, self, lambda ablty, target: ability.damage(ablty, target, 4, 8)), 0.6],
