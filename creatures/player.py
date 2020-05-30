@@ -27,6 +27,9 @@ class Player(creature.Creature):
         self.levelBonus = actions.LevelBonus(self, [])
         self.abilities = [actions.Use(self)] # the player's abilities list is not a frequency list because the player chooses abilities
 
+        self.states = {}
+        self.classInspect = lambda: "" # additional combat information (ex. rogue could say "Stealthed" or mage could say "Mana 100/100")
+
         # The player starts at level 1.
         self.levelUpExperience = [
             # 2  3    4    5    6    7     8     9     10
@@ -55,6 +58,10 @@ class Player(creature.Creature):
         self.abilities = self.abilities + classes.get_abilities(class_name)
         # abilities for higher levels
         self.levelBonus.abilities = classes.get_levelBonus(class_name)
+        # extra states (i.e. stealth or mana)
+        self.states = classes.get_states(class_name)
+        # extra inspect (i.e. "Stealthed" or "Mana 100/100")
+        self.classInspect = classes.get_classInspect(class_name)
 
     def updateActions(self):
         self.actions = self.baseActions + self.location.actions
@@ -108,7 +115,8 @@ class Player(creature.Creature):
         self.updateActions()
 
     def inspect(self):
-        return "You have " + output.formatNumber(self.health) + "/" + str(self.stats.health) + " health."
+        extra = self.classInspect(self)
+        return "You have " + output.formatNumber(self.health) + "/" + str(self.stats.health) + " health." + (" -- " + extra + " --" if len(extra) > 0 else "")
 
     def updateAttributes(self):
         while self.level < self.maxLevel and self.experience >= self.levelUpExperience[self.level - 1]:
@@ -131,7 +139,7 @@ class Player(creature.Creature):
         output.bellow("You died. Game over.")
 
     def attack(self, target):
-        ability = input.inputFromOptions("attack", self.abilities, lambda ability: str(ability), lambda ability: not ability.onCooldown(), "Please select an ability that isn't on cooldown.")
+        ability = input.inputFromOptions("attack", self.abilities, lambda ability: str(ability), lambda ability: ability.available(self), "That ability is not available right now.")
         output.separate()
         self.gear.proc(target)
         ability.activate(self, target)

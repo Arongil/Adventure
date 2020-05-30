@@ -3,11 +3,12 @@ import output
 
 class Ability:
 
-    def __init__(self, name, cooldown, cast):
+    def __init__(self, name, cooldown, cast, condition = lambda x: True):
         self.name = name
         self.cooldown = cooldown
         self.cooldownCount = 0
         self.cast = cast # cast is a function that takes a caster and a target then casts the ability on the target
+        self.condition = condition # condition may return false, for example, when a rogue must be stealthed to perform a certain ability
 
     def __str__(self):
         turn = "turns" if self.cooldownCount != 1 else "turn"
@@ -23,11 +24,14 @@ class Ability:
         if self.onCooldown():
             self.cooldownCount -= 1
 
+    def available(self, caster):
+        return not self.onCooldown() and self.condition(caster)
+
     def update(self):
         self.updateCooldown()
 
     def activate(self, caster, target):
-        if not self.onCooldown():
+        if self.available(caster):
             self.cast(self, caster, target)
             self.cooldownCount = self.cooldown + 1
 

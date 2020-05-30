@@ -348,7 +348,7 @@ class AricneaTheSly(monster.Monster):
             self.addEffect( effect.HealOverTime("glory for the undead", 2, 30, 50) )
             self.addEffect( effect.StrengthBuff("battle rage", 9, 0.6) )
         else:
-            self.abilities.getOption(lambda ability: not ability.onCooldown()).activate(target)
+            self.abilities.getOption(lambda ability: not ability.onCooldown()).activate(self, target)
 
 def getDampLair():
     def enter():
@@ -402,7 +402,7 @@ class UnholyOoze(monster.Monster):
 
     def attack(self, target):
         if self.health > 0:
-            self.abilities.getOption(lambda ability: not ability.onCooldown()).activate(target)
+            self.abilities.getOption(lambda ability: not ability.onCooldown()).activate(self, target)
         elif self.size > 1:
             self.size -= 1
             self.stats.health.value /= 2

@@ -117,9 +117,12 @@ class Use(action.Action):
     def __init__(self, player):
         action.Action.__init__(self, "use", player)
 
-    # define an update method and an onCooldown method so that Use can pass as an ability and an action
+    # define an update method and an onCooldown and an available method so that Use can pass as an ability and an action
     def onCooldown(self):
         return False
+
+    def available(self, caster):
+        return True
 
     def update(self):
         pass
