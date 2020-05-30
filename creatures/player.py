@@ -65,6 +65,8 @@ class Player(creature.Creature):
         self.classInspect = classes.get_classInspect(class_name)
         # update at the end of each turn (i.e. set stealth to false or regen mana)
         self.classUpdate = classes.get_classUpdate(class_name)
+        # output class information
+        output.proclaim(classes.get_classIntro(class_name))
 
     def updateActions(self):
         self.actions = self.baseActions + self.location.actions
@@ -119,7 +121,7 @@ class Player(creature.Creature):
 
     def inspect(self):
         extra = self.classInspect(self)
-        return "You have " + output.formatNumber(self.health) + "/" + str(self.stats.health) + " health." + (" -- " + extra + " --" if len(extra) > 0 else "")
+        return "You have " + output.formatNumber(self.health) + "/" + str(self.stats.health) + " health." + (" -- " + extra.upper() + " --" if len(extra) > 0 else "")
 
     def updateAttributes(self):
         while self.level < self.maxLevel and self.experience >= self.levelUpExperience[self.level - 1]:
@@ -140,6 +142,12 @@ class Player(creature.Creature):
     def die(self):
         self.alive = False
         output.bellow("You died. Game over.")
+        gameOver = input.getInput("game over")
+        # # # # # # # # # # # # # #
+        if gameOver == "debug":
+            self.alive = True
+            self.health = 50
+        # # # # # # # # # # # # # #
 
     def attack(self, target):
         ability = input.inputFromOptions("attack", self.abilities, lambda ability: str(ability), lambda ability: ability.available(self), "That ability is not available right now.")

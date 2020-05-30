@@ -23,6 +23,8 @@ def get_classInspect(class_name):
     return classes[class_name]["classInspect"]
 def get_classUpdate(class_name):
     return classes[class_name]["classUpdate"]
+def get_classIntro(class_name):
+    return classes[class_name]["classIntro"]
 
 # Current Classes: mage, rogue, paladin
 
@@ -54,9 +56,10 @@ classes["generic-example"] = {
 def mageInspect(player):
     return "Mana " + str(player.states["mana"]) + "/100"
 
-# mana regen per turn = base regen + spirit
+# mana regen per turn = base regen * spirit, where 1 point of spirit = 0.5 more mana per turn
 def regenMana(player):
-    newMana = player.states["mana"] + player.states["baseManaRegen"] + player.stats.spirit.value
+    modifier = player.stats.spirit.getValue() / player.stats.scale
+    newMana = player.states["mana"] + player.states["baseManaRegen"] * modifier
     player.states["mana"] = 100 if newMana > 100 else newMana
 def consumeMana(player, amount):
     player.states["mana"] -= amount
@@ -85,7 +88,7 @@ def getFrostbolt():
         consumeMana(player, manaCost)
         regenMana(player)
         ability.damage(ablty, player, target, 5, 11)
-        target.addEffect( effect.StrengthBuff("freeze", 3, -0.1) )
+        target.addEffect( effect.StrengthBuff("freeze", 3, -0.15) )
 
     return ability.Ability("frostbolt", cooldown=0, cast=frostboltLogic, condition=available)
 
@@ -97,7 +100,7 @@ def getScorch():
     def scorchLogic(ablty, player, target):
         consumeMana(player, manaCost)
         regenMana(player)
-        target.addEffect( effect.DamageOverTime("scorch", duration=8, lowerBound=2, upperBound=5, stackable=True) )
+        target.addEffect( effect.DamageOverTime("scorch", duration=8, lowerBound=2, upperBound=5, caster=player, stackable=True) )
 
     return ability.Ability("scorch", cooldown=0, cast=scorchLogic, condition=available)
 
@@ -131,21 +134,23 @@ classes["mage"] = {
     },
     "classInspect": mageInspect,
     "classUpdate": mageUpdate,
+    "classIntro": "Mages are spell-casters. This uses mana, which ranges from 0 to 100. Cheaper spells let a mage recover mana so the mage can cast expensive spells when necessary. Mages recover 10 mana per turn, increased by a higher spirit stat. FIREBALL does an average of 10 damage and costs 5 mana.",
     "stats": stats.Stats(
         health=80,
         armor=0,
         strength=0,
         spirit=0,
         criticalChance=0.1,
-        criticalStrike=2.1
+        criticalStrike=2.1,
+        dodge=0.02
     ),
     "abilities": [ getFireball() ],
     "levelBonus": [
         # ability, description, levelToGainAbility
         [getFrostbolt(), "Frostbolt freezes the enemy, dealing an average of 8 damage and reducing enemy's damage output by 15% for 3 turns. It costs 15 mana.", 3],
-        [getScorch(), "Scorch burns the enemy, dealing 2 to 5 damage per turn over 8 turns. It costs 30 mana. Stackable.", 7],
-        [getIceBarrier(), "Ice barrier summons a shield around you that reduces incoming damage by 50% for 4 turns. It has a 20 turn cooldown and costs 50 mana.", 11],
-        [getEvocate(), "Evocate restores your mana to full. It has a 40 turn cooldown.", 15]
+        [getScorch(), "Scorch burns the enemy, dealing 2 to 5 damage per turn over 8 turns. It costs 30 mana. Stackable.", 6],
+        [getIceBarrier(), "Ice barrier summons a shield around you that reduces incoming damage by 50% for 4 turns. It has a 20 turn cooldown and costs 50 mana.", 9],
+        [getEvocate(), "Evocate restores your mana to full. It has a 40 turn cooldown.", 12]
     ]
 }
 
@@ -159,8 +164,17 @@ def rogueInspect(player):
     displayInfo = filter(lambda i: player.states[i[1]], info)
     return ' '.join(i[0] for i in displayInfo)
 
-def rogueUpdate(player):
+def enterStealth(player):
+    player.states["stealth"] = True
+    # add dodge buff that will persist until it is removed upon unstealthing
+    player.addEffect( effect.DodgeBuff("stealth", duration=99999, amount=3, notify=False) )
+
+def exitStealth(player):
     player.states["stealth"] = False
+    player.removeEffect( effect.DodgeBuff("stealth", duration=99999, amount=3, notify=False) )
+
+def rogueUpdate(player):
+    exitStealth(player)
 
 def getStab():
     def stabLogic(ablty, player, target):
@@ -173,15 +187,14 @@ def getStab():
         # if the player coated their dagger with poison, apply it
         if player.states["daggerPoisoned"]:
             player.states["daggerPoisoned"] = False
-            target.addEffect( effect.DamageOverTime("poison", duration=3, lowerBound=6, upperBound=9) )
+            target.addEffect( effect.DamageOverTime("poison", duration=3, lowerBound=6, upperBound=9, caster=player) )
 
         # stab takes the player out of stealth
-        player.states["stealth"] = False
+        exitStealth(player)
 
         # stab also has 30% to put the player in stealth
         if random.random() < 0.3:
-
-            player.states["stealth"] = True
+            enterStealth(player)
             output.declare("Stab triggers stealth!")
 
     return ability.Ability("stab", cooldown=0, cast=stabLogic)
@@ -192,7 +205,7 @@ def getPoisonDagger():
 
     def poisonLogic(ablty, player, target):
         # poison can only be cast when stealthed
-        player.states["stealth"] = False
+        exitStealth(player)
         player.states["daggerPoisoned"] = True
         output.say("You coat your dagger in poison.")
 
@@ -203,20 +216,21 @@ def getSap():
         return player.states["stealth"]
 
     def sapLogic(ablty, player, target):
-        player.states["stealth"] = False
+        exitStealth(player)
         target.addEffect( effect.StrengthBuff("sap", duration=6, amount=-0.4) )
 
     return ability.Ability("sap", cooldown=20, cast=sapLogic, condition=available)
 
 def getEmbraceShadows():
     def embraceShadowsLogic(ablty, player, target):
-        player.states["stealth"] = True
+        enterStealth(player)
         player.addEffect( effect.ArmorBuff("embrace shadows", duration=3, amount=3) )
 
     return ability.Ability("embrace shadows", cooldown=20, cast=embraceShadowsLogic)
 
 def getRollTheBones():
     def rollTheBonesLogic(ablty, player, target):
+        exitStealth(player)
         player.addEffect( effect.CriticalChanceBuff("roll the bones", duration=10, amount=2) )
 
     return ability.Ability("roll the bones", cooldown=40, cast=rollTheBonesLogic)
@@ -228,20 +242,22 @@ classes["rogue"] = {
     },
     "classInspect": rogueInspect,
     "classUpdate": rogueUpdate,
+    "classIntro": "Rogues are quick and adept in poisons. Their abilities are enhanced when they are in stealth. STAB does an average of 10 damage (15 while stealthed), and it has a 30% chance to put a rogue in stealth. Rogues are 4x as likely to dodge while stealthed.",
     "stats": stats.Stats(
         health=100,
         armor=0,
         strength=0,
         spirit=0,
         criticalChance=0.15,
-        criticalStrike=2
+        criticalStrike=2,
+        dodge=0.05
     ),
     "abilities": [ getStab() ],
     "levelBonus": [
         # ability, description, levelToGainAbility
         [getPoisonDagger(), "Only usable if stealthed: concealed in the shadows, coat your dagger with poison to deal 6 to 9 damage per turn over 3 turns the next time you stab. Unstealths you.", 3],
-        [getSap(), "Only usable if stealthed: sap the enemy to reduce their damage output by 40% for 6 turns.", 7],
-        [getEmbraceShadows(), "Draw the shadows near, stealthing yourself and reducing all damage you take by 75% for 3 turns. It has a cooldown of 20 turns.", 11],
-        [getRollTheBones(), "Roll the bones puts the duel in the hands of fate, increasing your critical strike chance by 200% for 10 turns. It has a cooldown of 40 turns.", 15]
+        [getSap(), "Only usable if stealthed: sap the enemy to reduce their damage output by 40% for 6 turns. It has a cooldown of 20 turns.", 6],
+        [getEmbraceShadows(), "Draw the shadows near, stealthing yourself and reducing all damage you take by 75% for 3 turns. It has a cooldown of 20 turns.", 9],
+        [getRollTheBones(), "Roll the bones puts the duel in the hands of fate, increasing your critical strike chance by 200% for 10 turns. It has a cooldown of 40 turns.", 12]
     ]
 }

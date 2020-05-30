@@ -47,12 +47,12 @@ class DrunkenTrainee(monster.Monster):
     def __init__(self):
         monster.Monster.__init__(self, "drunken trainee", 60, loot.Loot("the drunken trainee", 5, 30, [
                 [item.Nothing(), 0.4],
-                [item.UsableItem("cheap whiskey", "it's nearly empty", 5, 19, lambda target: target.addEffect( effect.DamageOverTime("intoxication", 3, 1, 2) )), 0.6]
+                [item.UsableItem("cheap whiskey", "it's nearly empty", 5, 19, lambda target: target.addEffect( effect.DamageOverTime("intoxication", 3, 1, 2, self) )), 0.6]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
             [ability.Ability("charge", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 6, 10)), 0.5],
             [ability.Ability("stumble", 0, lambda ablty, caster, target: self.stumble()), 0.3],
-            [ability.Ability("vomit", 4, lambda ablty, caster, target: target.addEffect( effect.DamageOverTime("intoxicated vomit", 2, 3, 5) )), 0.2]
+            [ability.Ability("vomit", 4, lambda ablty, caster, target: target.addEffect( effect.DamageOverTime("intoxicated vomit", 2, 3, 5, self) )), 0.2]
         ])
 
     def stumble(self):
@@ -74,7 +74,7 @@ class GraglisTheGremlin(monster.Monster):
             [ability.Ability("hop and scratch", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 7, 16)), 0.5],
             [ability.Ability("mutter nonsense", 0, lambda ablty, caster, target: self.mutterNonsense()), 0.3],
             [ability.Ability("voodoo", 6, lambda ablty, caster, target: self.voodoo()), 0.2]
-        ], unique=True)
+        ], dodge=0.15, unique=True)
         self.gear.equip(self.voodooFetish)
 
     def mutterNonsense(self):
@@ -104,8 +104,8 @@ def getTraineeValley():
         actions.RestHeal(player),
         actions.Scavenge(player, [
             [actions.ScavengeGold(player, 0, 2), 0.98],
-            # health, armor, strength, spirit, criticalChance, criticalStrike
-            [shrine.StatShrine([20, 10, 10, 10, 0.1, 1], 50), 0.02]
+            # health, armor, strength, spirit, criticalChance, criticalStrike, dodge
+            [shrine.StatShrine([20, 10, 10, 10, 0.1, 1, 0.2], 50), 0.02]
         ])
     ]
     traineeValleyInteractions = [
@@ -203,8 +203,8 @@ def getTheSilentForest():
         actions.RestHeal(player),
         actions.Scavenge(player, [
             [actions.ScavengeGold(player, 0, 4), 0.99],
-            # health, armor, strength, spirit, criticalChance, criticalStrike
-            [shrine.StatShrine([20, 10, 10, 10, 0.1, 1], 50), 0.01]
+            # health, armor, strength, spirit, criticalChance, criticalStrike, dodge
+            [shrine.StatShrine([20, 10, 10, 10, 0.1, 1, 0.2], 50), 0.01]
         ])
     ]
     theSilentForestInteractions = [
@@ -384,7 +384,7 @@ class GiantSewerRat(monster.Monster):
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
             [ability.Ability("gnaw", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 8, 14)), 0.4],
             [ability.Ability("bite", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 4, 12)), 0.4],
-            [ability.Ability("sewer plague", 1, lambda ablty, caster, target: target.addEffect( effect.DamageOverTime("sewer plague", 3, 4, 6) )), 0.2]
+            [ability.Ability("sewer plague", 1, lambda ablty, caster, target: target.addEffect( effect.DamageOverTime("sewer plague", 3, 4, 6, self) )), 0.2]
         ])
 
 class UnholyOoze(monster.Monster):
@@ -392,7 +392,7 @@ class UnholyOoze(monster.Monster):
     def __init__(self):
         monster.Monster.__init__(self, "unholy ooze", 60, loot.Loot("the unholy ooze", 2, 70, [
                 [item.Nothing(), 0.8],
-                [gear.Ring("unholy band", "an irregular loop formed from the hard core of an ancient ooze", 24, 99, lambda target: target.stats.add(criticalStrike=0.5), lambda target: target.stats.add(criticalStrike=-0.5)), 0.2]
+                [gear.Ring("unholy band", "an irregular loop formed from the hard core of an ancient ooze", 24, 99, lambda target: target.stats.add(criticalStrike=0.5, dodge=0.01), lambda target: target.stats.add(criticalStrike=-0.5, dodge=-0.01)), 0.2]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
             [ability.Ability("spit slime", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 6, 10)), 0.7],
@@ -412,7 +412,7 @@ class UnholyOoze(monster.Monster):
 
 def boozeStainedWarglaivesProc(wearer, target):
     if random.random() < 0.15:
-        target.addEffect( effect.DamageOverTime("contagious intoxication", 3, 4, 6) )
+        target.addEffect( effect.DamageOverTime("contagious intoxication", 3, 4, 6, caster=wearer) )
 boozeStainedWarglaives = gear.Weapon("booze-stained warglaives", "they seriously smell like cheap whisky, but hey, they're warglaives!", 19, 31, lambda target: target.stats.add(armor=6, health=15), lambda target: target.stats.add(armor=-6, health=-15), boozeStainedWarglaivesProc)
 
 captainJorna = npc.NPC("Captain Jorna", "Fort Morning never pays its hardest workers enough. They give me a pittance, I tell you! It's barely enough to buy rations and drink.", [
@@ -459,7 +459,7 @@ captainJorna = npc.NPC("Captain Jorna", "Fort Morning never pays its hardest wor
 morningWares = shop.Shop("Morning Wares", "Welcome to Morning Wares, traveller. We carry all manner of artifacts and armor.", [
     potions.HealthPotion("lesser health potion", "better than resting", 6, 19, 20),
     potions.HealthPotion("health potion", "an over-the-counter prescription for all dying heroes", 9, 29, 30),
-    item.UsableItem("strength potion", "induces rage, overwhelming power, and possibly constipation", 7, 34, lambda target: target.addEffect( effect.StrengthBuffAdd("strength potion", 8, 6))),
+    item.UsableItem("strength potion", "induces rage, overwhelming power, and possibly constipation", 7, 34, lambda target: target.addEffect( effect.StrengthBuffAdd("strength potion", 8, 6, stackable=True))),
     gear.Weapon("old knife", "short, rusted, but sharp", 6, 24, lambda target: target.stats.add(strength=3), lambda target: target.stats.add(strength=-3)),
     gear.Boots("leather boots", "they put a barrier between your feet and the ground", 12, 35, lambda target: target.stats.add(health=5, armor=3), lambda target: target.stats.add(health=-5, armor=-3))
 ])

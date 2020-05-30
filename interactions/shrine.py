@@ -22,30 +22,24 @@ class StatShrine(Shrine):
 
     def __init__(self, amounts, duration):
         Shrine.__init__(self, self.addBonus)
-        self.amounts = amounts # amounts is an array of numbers [health, armor, strength, spirit, criticalChance, criticalStrike]
+        self.amounts = amounts # amounts is an array of numbers [health, armor, strength, spirit, criticalChance, criticalStrike, dodge]
         self.duration = duration
-        self.stats = [
-            self.player.stats.health,
-            self.player.stats.armor,
-            self.player.stats.strength,
-            self.player.stats.spirit,
-            self.player.stats.criticalChance,
-            self.player.stats.criticalStrike
-        ]
         self.buffs = [
             effect.HealthBuff,
             effect.ArmorBuffAdd,
             effect.StrengthBuffAdd,
             effect.SpiritBuffAdd,
             effect.CriticalChanceBuffAdd,
-            effect.CriticalStrikeBuffAdd
+            effect.CriticalStrikeBuffAdd,
+            effect.DodgeBuffAdd
         ]
 
     def addBonus(self):
+        stats = self.player.stats.getStats()
         output.say("Which stat do you want to boost for " + str(self.duration) + " turns?")
         while True:
-            stat = input.inputFromOptions("shrine", self.stats, lambda stat: stat.name + " by " + output.formatNumber(self.amounts[self.stats.index(stat)]) + ", currently at " + str(stat) + ".")
-            index = self.stats.index(stat)
+            stat = input.inputFromOptions("shrine", stats, lambda stat: stat.name + " by " + output.formatNumber(self.amounts[stats.index(stat)]) + ", currently at " + str(stat) + ".")
+            index = stats.index(stat)
             output.say("Are you sure you want to boost " + stat.name + " by " + output.formatNumber(self.amounts[index]) + " for " + str(self.duration) + " turns?")
             if input.yesNo():
                 self.player.addEffect( self.buffs[index]("shrine bonus", self.duration, self.amounts[index]) )

@@ -10,7 +10,8 @@ class Stat:
         self.multiplication = 1
 
     def __str__(self):
-        return output.formatNumber( (self.value + self.base + self.addition) * self.multiplication - self.base )
+        # use two decimals of precision for stats
+        return output.formatNumber( (self.value + self.base + self.addition) * self.multiplication - self.base, 2 )
 
     def percent(self):
         return output.formatNumber( ( (self.value + self.base + self.addition) * self.multiplication - self.base ) * 100 )

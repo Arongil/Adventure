@@ -20,12 +20,12 @@ def bar():
 def separate():
     print("")
 
-def formatNumber(n):
+def formatNumber(n, digits=1):
     integerDiff = abs(n) - int(abs(n))
-    if integerDiff < 0.1:
+    if integerDiff < 10**(-digits):
         return str(int(n))
     else:
-        return str(round(n, 1))
+        return str(round(n, digits))
 
 # If necessary, a map between options and strings can be passed. By default, this map is just str.
 def outputList(options, mapOption = lambda option: str(option)):

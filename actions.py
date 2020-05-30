@@ -139,35 +139,29 @@ class LevelBonus(action.Action):
     def __init__(self, player, abilities):
         action.Action.__init__(self, "bonus", player)
         # the stats offered and their associated bonuses
-        self.stats = [
-            self.player.stats.health,
-            self.player.stats.armor,
-            self.player.stats.strength,
-            self.player.stats.spirit,
-            self.player.stats.criticalChance,
-            self.player.stats.criticalStrike
-        ]
         self.bonuses = {
             "health": 10,
             "armor": 2,
             "strength": 2,
             "spirit": 2,
             "critical hit chance": 0.02,
-            "critical hit damage": 0.2
+            "critical hit damage": 0.2,
+            "dodge": 0.01
         }
         self.abilities = abilities # array with abilities, descriptions, and level numbers for when to award them
 
     def activate(self):
+        stats = self.player.stats.getStats()
         output.say("Which stat do you want to boost?")
         while True:
-            stat = input.inputFromOptions(self.name, self.stats, lambda stat: stat.name + " by " + str(self.bonuses[stat.name]) + ", currently at " + str(stat) + ".")
+            stat = input.inputFromOptions(self.name, stats, lambda stat: stat.name + " by " + str(self.bonuses[stat.name]) + ", currently at " + str(stat) + ".")
             output.say("Are you sure you want to boost " + str(stat.name) + " by " + str(self.bonuses[stat.name]) + "?")
             if input.yesNo():
                 stat.add(self.bonuses[stat.name])
                 break
         if len(self.abilities) > 0 and self.player.level == self.abilities[0][2]: # check if level is correct
             output.exclaim("You learn a new ability: " + str(self.abilities[0][0]).upper() + "!")
-            output.declare(self.abilities[0][1]) # skill description
+            output.declare(self.abilities[0][1]) # ability description
             self.player.abilities.append(self.abilities[0][0])
             self.abilities.pop(0)
 
