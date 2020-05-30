@@ -7,5 +7,5 @@ def get_player():
 
 ##############
 global debug
-debug = True
+debug = False
 ##############
