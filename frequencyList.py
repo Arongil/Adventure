@@ -3,7 +3,8 @@ from random import random
 class FrequencyList:
 
     def __init__(self, options = []):
-        self.options = options # options is a 2 by n array with the option and the chance: [["walk", 0.4], ["run", 0.6]]
+        # options is a 2 by n array with the option and the chance: [["walk", 0.4], ["run", 0.6]]
+        self.options = options
         # options are automatically normalized so the total probability is 1
         self.normalize()
 
@@ -14,9 +15,7 @@ class FrequencyList:
         return self.options[index][0]
 
     def normalize(self):
-        total = 0
-        for i in self.options:
-            total += i[1]
+        total = sum(option[1] for option in self.options)
         for i in range(len(self.options)):
             self.options[i][1] /= total
 
@@ -25,10 +24,7 @@ class FrequencyList:
         self.normalize()
 
     def getAll(self):
-        options = []
-        for i in self.options:
-            options.append(i[0])
-        return options
+        return [option[0] for option in self.options]
 
     # A condition may be satisfied that the output must satisfy. Assume that at least one output satisfies the condition.
     def getOption(self, condition = lambda option: True):

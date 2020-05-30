@@ -1,10 +1,11 @@
 import creatures.player
 import location
 
-global player
-player = creatures.player.Player(100, location.Nowhere())
+player = creatures.player.Player(health=100, location=location.Nowhere())
+def get_player():
+    return player
 
 ##############
 global debug
-debug = False
+debug = True
 ##############

@@ -2,6 +2,7 @@ import input
 import output
 import frequencyList as fList
 import creatures.creature as creature
+import creatures.classes as classes
 import ability
 import actions
 import effect
@@ -13,8 +14,8 @@ class Player(creature.Creature):
         self.location = location # the player's actions derive from its location
 
         self.settings = {
-            "auto-rest": False,
-            "auto-scavenge": False
+            "auto-rest": True,
+            "auto-scavenge": True
         }
 
         # baseActions are actions the player can always take.
@@ -23,17 +24,8 @@ class Player(creature.Creature):
             actions.Use(self)
         ]
         self.actions = self.baseActions + self.location.actions
-        self.levelBonus = actions.LevelBonus(self, [
-            # name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)
-            [ability.Ability("fireball", 2, self, lambda ablty, target: ability.damage(ablty, target, 10, 20)), "Fireball burns the enemy between 10 and 20 base damage.", 3],
-            [ability.Ability("iron heart", 20, self, lambda ablty, target: ablty.caster.addEffect( effect.ArmorBuff("iron heart", 4, 1) )), "Iron heart strengthens your resolve, halving the damage you take for four turns.", 8],
-            [ability.Ability("frenzy", 20, self, lambda ablty, target: ablty.caster.addEffect( effect.StrengthBuff("frenzy", 6, 0.4) )), "Frenzy makes you wild and powerful, increasing the damage you deal by 40% for six turns.", 15]
-        ])
-        self.abilities = [
-            actions.Use(self),
-            # name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)
-            ability.Ability("punch", 0, self, lambda ablty, target: ability.damage(ablty, target, 5, 15))
-        ] # the player's abilities list is not a frequency list because it chooses abilities
+        self.levelBonus = actions.LevelBonus(self, [])
+        self.abilities = [actions.Use(self)] # the player's abilities list is not a frequency list because the player chooses abilities
 
         # The player starts at level 1.
         self.levelUpExperience = [
@@ -51,6 +43,18 @@ class Player(creature.Creature):
         self.isPlayer = True
         self.unique = False
         self.alive = True
+
+    def init(self):
+        # initialize player's class (e.g. mage)
+        output.say("What class do you want to play?")
+        class_name = input.inputFromOptions("class", classes.get_classes())
+        # base stats
+        self.stats = classes.get_stats(class_name)
+        self.health = self.stats.health.getValue()
+        # abilities for level 1
+        self.abilities = self.abilities + classes.get_abilities(class_name)
+        # abilities for higher levels
+        self.levelBonus.abilities = classes.get_levelBonus(class_name)
 
     def updateActions(self):
         self.actions = self.baseActions + self.location.actions
@@ -130,4 +134,4 @@ class Player(creature.Creature):
         ability = input.inputFromOptions("attack", self.abilities, lambda ability: str(ability), lambda ability: not ability.onCooldown(), "Please select an ability that isn't on cooldown.")
         output.separate()
         self.gear.proc(target)
-        ability.activate(target)
+        ability.activate(self, target)

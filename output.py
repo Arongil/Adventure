@@ -29,5 +29,5 @@ def formatNumber(n):
 
 # If necessary, a map between options and strings can be passed. By default, this map is just str.
 def outputList(options, mapOption = lambda option: str(option)):
-    for i in range(len(options)):
-        say("  " + str(i + 1) + ": " + mapOption(options[i]))
+    for i, option in enumerate(options):
+        say("  " + str(i + 1) + ": " + mapOption(option))

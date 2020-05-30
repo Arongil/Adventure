@@ -58,7 +58,8 @@ class Creature:
         return amount
 
     def addEffect(self, effect):
-        self.effects.append(effect)
+        if effect.stackable or effect.name not in [eff.name for eff in self.effects]:
+            self.effects.append(effect)
 
     def removeEffect(self, effect):
         self.effects.remove(effect)

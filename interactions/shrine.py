@@ -10,7 +10,7 @@ class Shrine(interaction.Interaction):
         interaction.Interaction.__init__(self)
         self.use = use # function
         self.mysteryWords = fList.FrequencyList([["a mysterious", 0.2], ["a strange", 0.2], ["an odd", 0.2], ["a peculiar", 0.2], ["an eerie", 0.2]])
-        self.shrineAdjectives = fList.FrequencyList([["brown", 0.1], ["gray", 0.1], ["broken", 0.1], ["cracked", 0.1], ["sunken", 0.1], ["broken", 0.1], ["stone", 0.1], ["chiseled", 0.1], ["short", 0.1], ["tall", 0.1]])
+        self.shrineAdjectives = fList.FrequencyList([["pyramidal", 0.1], ["gray", 0.1], ["broken", 0.1], ["cracked", 0.1], ["sunken", 0.1], ["stone", 0.1], ["chiseled", 0.1], ["opulent", 0.1], ["short", 0.1], ["tall", 0.1]])
         self.shrineNouns = fList.FrequencyList([["pillar", 0.2], ["obelisk", 0.2], ["monolith", 0.2], ["shrine", 0.2], ["altar", 0.2]])
         self.nearWords = fList.FrequencyList([["a copse of dead trees", 0.2], ["a small hill", 0.2], ["a small cave", 0.2], ["a murky pond", 0.2], ["a faded signpost", 0.2]])
 

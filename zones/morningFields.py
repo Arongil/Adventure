@@ -17,6 +17,8 @@ import ability
 import effect
 import item
 
+player = globals.get_player()
+
 '''
 Morning Fields is the starting zone. It has three locations: Trainee Valley, The Silent Forest, and Fort Morning. The connections are as follows.
 TRAINEE VALLEY ---> THE SILENT FOREST, FORT MORNING
@@ -35,9 +37,9 @@ class Wolf(monster.Monster):
                 [gear.Gloves("torn wolfhide gloves", "the coarse fabric seems vaguely glovelike", 8, 26, lambda creature: creature.stats.add(armor=2), lambda creature: creature.stats.add(armor=-2)), 0.05]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("bite", 0, self, lambda ablty, target: ability.damage(ablty, target, 2, 6)), 0.5],
-            [ability.Ability("snap", 0, self, lambda ablty, target: ability.damage(ablty, target, 4, 8)), 0.3],
-            [ability.Ability("lick wounds", 2, self, lambda ablty, target: ability.heal(ablty, target, 4, 10)), 0.2]
+            [ability.Ability("bite", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 2, 6)), 0.5],
+            [ability.Ability("snap", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 4, 8)), 0.3],
+            [ability.Ability("lick wounds", 2, lambda ablty, caster, target: ability.heal(ablty, caster, target, 4, 10)), 0.2]
         ])
 
 class DrunkenTrainee(monster.Monster):
@@ -48,9 +50,9 @@ class DrunkenTrainee(monster.Monster):
                 [item.UsableItem("cheap whiskey", "it's nearly empty", 5, 19, lambda target: target.addEffect( effect.DamageOverTime("intoxication", 3, 1, 2) )), 0.6]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("charge", 0, self, lambda ablty, target: ability.damage(ablty, target, 6, 10)), 0.5],
-            [ability.Ability("stumble", 0, self, lambda ablty, target: self.stumble()), 0.3],
-            [ability.Ability("vomit", 4, self, lambda ablty, target: target.addEffect( effect.DamageOverTime("intoxicated vomit", 2, 3, 5) )), 0.2]
+            [ability.Ability("charge", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 6, 10)), 0.5],
+            [ability.Ability("stumble", 0, lambda ablty, caster, target: self.stumble()), 0.3],
+            [ability.Ability("vomit", 4, lambda ablty, caster, target: target.addEffect( effect.DamageOverTime("intoxicated vomit", 2, 3, 5) )), 0.2]
         ])
 
     def stumble(self):
@@ -69,9 +71,9 @@ class GraglisTheGremlin(monster.Monster):
                 [self.voodooFetish, 1]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("hop and scratch", 0, self, lambda ablty, target: ability.damage(ablty, target, 7, 16)), 0.5],
-            [ability.Ability("mutter nonsense", 0, self, lambda ablty, target: self.mutterNonsense()), 0.3],
-            [ability.Ability("voodoo", 6, self, lambda ablty, target: self.voodoo()), 0.2]
+            [ability.Ability("hop and scratch", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 7, 16)), 0.5],
+            [ability.Ability("mutter nonsense", 0, lambda ablty, caster, target: self.mutterNonsense()), 0.3],
+            [ability.Ability("voodoo", 6, lambda ablty, caster, target: self.voodoo()), 0.2]
         ], unique=True)
         self.gear.equip(self.voodooFetish)
 
@@ -99,9 +101,9 @@ def getTraineeValley():
         ]).getOption()
 
     traineeValleyActions = [
-        actions.RestHeal(globals.player),
-        actions.Scavenge(globals.player, [
-            [actions.ScavengeGold(globals.player, 0, 2), 0.98],
+        actions.RestHeal(player),
+        actions.Scavenge(player, [
+            [actions.ScavengeGold(player, 0, 2), 0.98],
             # health, armor, strength, spirit, criticalChance, criticalStrike
             [shrine.StatShrine([20, 10, 10, 10, 0.1, 1], 50), 0.02]
         ])
@@ -125,9 +127,9 @@ class ProwlingFox(monster.Monster):
                 [item.Item("bushy tail", "a muddled red to blend in with the trees", 4, 19), 0.1]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("pounce", 999, self, lambda ablty, target: ability.damage(ablty, target, 14, 20)), 999],
-            [ability.Ability("claw", 0, self, lambda ablty, target: ability.damage(ablty, target, 6, 8)), 0.8],
-            [ability.Ability("tense", 2, self, lambda ablty, target: ablty.caster.addEffect( effect.StrengthBuff("tense", 1, 0.5) )), 0.2]
+            [ability.Ability("pounce", 999, lambda ablty, caster, target: ability.damage(ablty, caster, target, 14, 20)), 999],
+            [ability.Ability("claw", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 6, 8)), 0.8],
+            [ability.Ability("tense", 2, lambda ablty, caster, target: caster.addEffect( effect.StrengthBuff("tense", 1, 0.5) )), 0.2]
         ])
 
 class Owl(monster.Monster):
@@ -138,8 +140,8 @@ class Owl(monster.Monster):
                 [item.Item("feather", "it's definitely a feather", 1, 4), 0.2]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("peck", 0, self, lambda ablty, target: ability.damage(ablty, target, 4, 8)), 0.6],
-            [ability.Ability("gouge", 0, self, lambda ablty, target: ability.damage(ablty, target, 8, 12)), 0.4]
+            [ability.Ability("peck", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 4, 8)), 0.6],
+            [ability.Ability("gouge", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 8, 12)), 0.4]
         ])
 
 class SorcererOutcast(monster.Monster):
@@ -152,9 +154,9 @@ class SorcererOutcast(monster.Monster):
                 [gear.Helmet("pointy black hat", "several patches mottle the hat, including a long seam directly above the brim", 19, 49, lambda creature: creature.stats.add(criticalChance=0.05), lambda creature: creature.stats.add(criticalChance=-0.05)), 0.2]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("frostbolt", 0, self, lambda ablty, target: ability.damage(ablty, target, 8, 14)), 0.5],
-            [ability.Ability("frigid wind", 2, self, lambda ablty, target: target.addEffect( effect.StrengthBuff("frigid wind", 2, -0.5) )), 0.3],
-            [ability.Ability("icy shield", 4, self, lambda ablty, target: ablty.caster.addEffect( effect.ArmorBuff("icy shield", 3, 1) )), 0.2]
+            [ability.Ability("frostbolt", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 8, 14)), 0.5],
+            [ability.Ability("frigid wind", 2, lambda ablty, caster, target: target.addEffect( effect.StrengthBuff("frigid wind", 2, -0.5) )), 0.3],
+            [ability.Ability("icy shield", 4, lambda ablty, caster, target: caster.addEffect( effect.ArmorBuff("icy shield", 3, 1) )), 0.2]
         ], armor=4)
 
 class SkeletonScout(monster.Monster):
@@ -165,9 +167,9 @@ class SkeletonScout(monster.Monster):
                 [item.Item("cracked bone", "dirty gray with a scratch along its middle", 3, 9), 0.6]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("charge", 999, self, lambda ablty, target: ability.damage(ablty, target, 9, 16)), 999],
-            [ability.Ability("slash", 0, self, lambda ablty, target: ability.damage(ablty, target, 6, 15)), 0.8],
-            [ability.Ability("fuse bone", 4, self, lambda ablty, target: ability.heal(ablty, target, 18, 30)), 0.2]
+            [ability.Ability("charge", 999, lambda ablty, caster, target: ability.damage(ablty, caster, target, 9, 16)), 999],
+            [ability.Ability("slash", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 6, 15)), 0.8],
+            [ability.Ability("fuse bone", 4, lambda ablty, caster, target: ability.heal(ablty, caster, target, 18, 30)), 0.2]
         ])
 
 class DoomPanda(monster.Monster):
@@ -178,8 +180,8 @@ class DoomPanda(monster.Monster):
                 [gear.Weapon("The Black Scythe", "the sword of the doom panda", 1, 2, lambda target: target.stats.add(strength=10, criticalChance=0.1), lambda target: target.stats.add(strength=-10, criticalChance=-0.1)), 0.5]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("cuddle", 0, self, lambda ablty, target: ability.heal(ablty, target, 1, 5)), 0.9],
-            [ability.Ability("DOOOOOOOOOOM", 6, self, lambda ablty, target: ability.damage(ablty, target, 80, 100)), 0.1],
+            [ability.Ability("cuddle", 0, lambda ablty, caster, target: ability.heal(ablty, caster, target, 1, 5)), 0.9],
+            [ability.Ability("DOOOOOOOOOOM", 6, lambda ablty, caster, target: ability.damage(ablty, caster, target, 80, 100)), 0.1],
         ], armor=16, criticalChance=0)
 
 def getTheSilentForest():
@@ -198,9 +200,9 @@ def getTheSilentForest():
         ]).getOption()
 
     theSilentForestActions = [
-        actions.RestHeal(globals.player),
-        actions.Scavenge(globals.player, [
-            [actions.ScavengeGold(globals.player, 0, 4), 0.99],
+        actions.RestHeal(player),
+        actions.Scavenge(player, [
+            [actions.ScavengeGold(player, 0, 4), 0.99],
             # health, armor, strength, spirit, criticalChance, criticalStrike
             [shrine.StatShrine([20, 10, 10, 10, 0.1, 1], 50), 0.01]
         ])
@@ -223,9 +225,9 @@ class SkeletonWarrior(monster.Monster):
                 [item.Item("cracked bone", "dirty gray with a scratch along its middle", 3, 9), 0.4]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("charge", 999, self, lambda ablty, target: ability.damage(ablty, target, 9, 16)), 999],
-            [ability.Ability("slash", 0, self, lambda ablty, target: ability.damage(ablty, target, 6, 15)), 0.8],
-            [ability.Ability("fuse bone", 4, self, lambda ablty, target: ability.heal(ablty, target, 18, 30)), 0.2]
+            [ability.Ability("charge", 999, lambda ablty, caster, target: ability.damage(ablty, caster, target, 9, 16)), 999],
+            [ability.Ability("slash", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 6, 15)), 0.8],
+            [ability.Ability("fuse bone", 4, lambda ablty, caster, target: ability.heal(ablty, caster, target, 18, 30)), 0.2]
         ])
 
 class SkeletonArcher(monster.Monster):
@@ -238,9 +240,9 @@ class SkeletonArcher(monster.Monster):
                 [gear.Boots("crude sabatons", "probably held together with mud and bone marrow", 15, 44, lambda target: target.stats.add(armor=2, criticalChance=0.02), lambda target: target.stats.add(armor=-2, criticalChance=-0.02)), 0.1]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("iron bolt", 0, self, lambda ablty, target: ability.damage(ablty, target, 9, 14)), 0.5],
-            [ability.Ability("arrow as dagger", 0, self, lambda ablty, target: ability.damage(ablty, target, 13, 21)), 0.4],
-            [ability.Ability("archer's resolve", 2, self, lambda ablty, target: ablty.caster.addEffect( effect.CriticalChanceBuffAdd("archer's resolve", 2, 0.6) )), 0.1]
+            [ability.Ability("iron bolt", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 9, 14)), 0.5],
+            [ability.Ability("arrow as dagger", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 1, 3, 21)), 0.4],
+            [ability.Ability("archer's resolve", 2, lambda ablty, caster, target: caster.addEffect( effect.CriticalChanceBuffAdd("archer's resolve", 2, 0.6) )), 0.1]
         ])
 
 class Ghoul(monster.Monster):
@@ -251,15 +253,20 @@ class Ghoul(monster.Monster):
                 [item.Item("decayed fingernail", "dry, brittle, came from a ghoul", 1, 4), 0.2]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("knitting flesh", 999, self, lambda ablty, target: ablty.caster.addEffect( effect.HealOverTime("knitting flesh", 9, 4, 10))), 999],
-            [ability.Ability("mindless maul", 0, self, lambda ablty, target: ability.damage(ablty, target, 9, 18)), 0.7],
-            [ability.Ability("putrid breath", 5, self, lambda ablty, target: target.addEffect( effect.ArmorBuff("putrid breath", 4, -0.3) )), 0.3]
+            [ability.Ability("knitting flesh", 999, lambda ablty, caster, target: caster.addEffect( effect.HealOverTime("knitting flesh", 9, 4, 10))), 999],
+            [ability.Ability("mindless maul", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 9, 18)), 0.7],
+            [ability.Ability("putrid breath", 5, lambda ablty, caster, target: target.addEffect( effect.ArmorBuff("putrid breath", 4, -0.3) )), 0.3]
         ])
 
 #################### W # A # R # N # I # N # G ####################
 LJN = gear.Weapon("Laker-Justin Nunchucks", "You can probably guess the words on each nunchuck", 1000, 1001, lambda target: target.stats.add(strength=1000000, criticalChance=1, criticalStrike=15, armor=1000), lambda target: target.stats.add(strength=-1000000, criticalChance=-1, criticalStrike=-15, armor=-1000))
+def addExp(caster, amount):
+    caster.experience += amount
+expPotions = item.UsableItem("Experience Potion", "The devs shouldn't have added this one", 1000, 1001, lambda caster: addExp(caster, 2000), 99)
 if globals.debug:
-    globals.player.inventory.addItem(LJN)
+    player.inventory.addItem(LJN)
+    player.inventory.addItem(expPotions)
+    player.inventory.addGold(999999)
 ###################### D # A # N # G # E # R ######################
 
 def getSkeletonCave():
@@ -276,10 +283,10 @@ def getSkeletonCave():
         ]).getOption()
 
     skeletonCaveActions = [
-        actions.RestHeal(globals.player),
-        actions.Scavenge(globals.player, [
-            [actions.ScavengeGold(globals.player, 2, 6), 0.9],
-            [actions.FindItem(globals.player, lambda drop: "While exploring the gloomy cave, you stumble across an small iron chest. You find " + str(drop) + ".", [
+        actions.RestHeal(player),
+        actions.Scavenge(player, [
+            [actions.ScavengeGold(player, 2, 6), 0.9],
+            [actions.FindItem(player, lambda drop: "While exploring the gloomy cave, you stumble across an small iron chest. You find " + str(drop) + ".", [
                 [potions.HealthPotion("health potion", "a ghoul might have taken a swig", 14, 49, 35), 0.6],
                 [gear.Trinket("misplaced femur", "where could its owner be?", 19, 59, lambda target: target.stats.add(health=20), lambda target: target.stats.add(health=-20)), 0.1]]), 0.1]
         ])
@@ -299,8 +306,8 @@ class BoneHound(monster.Monster):
     def __init__(self):
         monster.Monster.__init__(self, "bone hound", 30, loot.Loot("the bone hound", 0, 0), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("bony bite", 0, self, lambda ablty, target: ability.damage(ablty, target, 6, 9)), 0.7],
-            [ability.Ability("howl", 2, self, lambda ablty, target: ablty.caster.addEffect( effect.StrengthBuffAdd("howl", 2, 12) )), 0.3]
+            [ability.Ability("bony bite", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 6, 9)), 0.7],
+            [ability.Ability("howl", 2, lambda ablty, caster, target: caster.addEffect( effect.StrengthBuffAdd("howl", 2, 12) )), 0.3]
         ])
 
 class AricneaTheSly(monster.Monster):
@@ -317,9 +324,9 @@ class AricneaTheSly(monster.Monster):
                 [self.sting, 1]
             ], True), [ # the True signifies Aricnea will drop all items in his loot table, every time.
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("stab", 0, self, lambda ablty, target: ability.damage(ablty, target, 11, 19)), 0.6],
-            [ability.Ability("fan of knives", 0, self, lambda ablty, target: ability.damage(ablty, target, 18, 26)), 0.2],
-            [ability.Ability("draw shadows", 3, self, lambda ablty, target: ablty.caster.addEffect( effect.ArmorBuff("draw shadows", 3, 0.8) )), 0.2]
+            [ability.Ability("stab", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 11, 19)), 0.6],
+            [ability.Ability("fan of knives", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 18, 26)), 0.2],
+            [ability.Ability("draw shadows", 3, lambda ablty, caster, target: caster.addEffect( effect.ArmorBuff("draw shadows", 3, 0.8) )), 0.2]
         ], unique=True)
         self.gear.equip(self.sting)
         self.calledDogs = False
@@ -333,9 +340,9 @@ class AricneaTheSly(monster.Monster):
             output.bar()
             output.exclaim("Ha! You insect think to best me? Finish the swine, dogs!")
             output.bar()
-            globals.player.update()
+            player.update()
             self.dogFight.activate()
-            globals.player.update()
+            player.update()
             self.dogFight.activate()
             output.exclaim("Aaaah! You shall not defeat the forces of the undead... we are eternal!")
             self.addEffect( effect.HealOverTime("glory for the undead", 2, 30, 50) )
@@ -355,7 +362,7 @@ def getDampLair():
         ]).getOption()
 
     skeletonCaveActions = [
-        actions.RestHeal(globals.player)
+        actions.RestHeal(player)
     ]
     skeletonCaveInteractions = [
         [fight.Fight(getMonster), 999999999, True],
@@ -375,9 +382,9 @@ class GiantSewerRat(monster.Monster):
                 [item.Item("strange doubloon", "cracked and faded, but it looks to be made of gold", 19, 84), 0.1]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("gnaw", 0, self, lambda ablty, target: ability.damage(ablty, target, 8, 14)), 0.4],
-            [ability.Ability("bite", 0, self, lambda ablty, target: ability.damage(ablty, target, 4, 12)), 0.4],
-            [ability.Ability("sewer plague", 1, self, lambda ablty, target: target.addEffect( effect.DamageOverTime("sewer plague", 3, 4, 6) )), 0.2]
+            [ability.Ability("gnaw", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 8, 14)), 0.4],
+            [ability.Ability("bite", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 4, 12)), 0.4],
+            [ability.Ability("sewer plague", 1, lambda ablty, caster, target: target.addEffect( effect.DamageOverTime("sewer plague", 3, 4, 6) )), 0.2]
         ])
 
 class UnholyOoze(monster.Monster):
@@ -388,8 +395,8 @@ class UnholyOoze(monster.Monster):
                 [gear.Ring("unholy band", "an irregular loop formed from the hard core of an ancient ooze", 24, 99, lambda target: target.stats.add(criticalStrike=0.5), lambda target: target.stats.add(criticalStrike=-0.5)), 0.2]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("spit slime", 0, self, lambda ablty, target: ability.damage(ablty, target, 6, 10)), 0.7],
-            [ability.Ability("jellification", 3, self, lambda ablty, target: ablty.caster.addEffect( effect.ArmorBuff("jellification", 2, 1.4) )), 0.3]
+            [ability.Ability("spit slime", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 6, 10)), 0.7],
+            [ability.Ability("jellification", 3, lambda ablty, caster, target: caster.addEffect( effect.ArmorBuff("jellification", 2, 1.4) )), 0.3]
         ])
         self.size = 3
 
@@ -474,12 +481,12 @@ def getFortMorning():
         ]).getOption()
 
     fortMorningActions = [
-        actions.RestHeal(globals.player),
-        actions.Scavenge(globals.player, [
-            [actions.ScavengeGold(globals.player, 0, 3), 1]
+        actions.RestHeal(player),
+        actions.Scavenge(player, [
+            [actions.ScavengeGold(player, 0, 3), 1]
         ]),
-        actions.Talk(globals.player, [captainJorna]),
-        actions.Shop(globals.player, [morningWares, villageArmory])
+        actions.Talk(player, [captainJorna]),
+        actions.Shop(player, [morningWares, villageArmory])
     ]
     fortMorningInteractions = [
         [actions.Nothing(), 0.93],
@@ -497,13 +504,13 @@ fortMorning = getFortMorning()
 
 # Add connections between locations. It's always free to stay put.
 # TAXI STRATEGY: keep prices low so players are motivated to do quests that require travel. Players are implicitly motivated to not travel to zones out of their level range, where the monsters could easily kill them.
-traineeValley.setTaxi(actions.Taxi(globals.player, "Hello, " + str(globals.player) + ". I hear you'd like to travel. What can I do for you?", [[traineeValley, 0], [fortMorning, 4], [theSilentForest, 9]]))
-traineeValley.interactions.add(actions.OfferLocationChange(globals.player, "A merchant's caravan approaches you. Its leader asks whether you want a ride to Fort Morning, where they are heading to sell western fish. Do you want to travel with them?", [fortMorning]), 0.01)
+traineeValley.setTaxi(actions.Taxi(player, "Hello, " + str(player) + ". I hear you'd like to travel. What can I do for you?", [[traineeValley, 0], [fortMorning, 4], [theSilentForest, 9]]))
+traineeValley.interactions.add(actions.OfferLocationChange(player, "A merchant's caravan approaches you. Its leader asks whether you want a ride to Fort Morning, where they are heading to sell western fish. Do you want to travel with them?", [fortMorning]), 0.01)
 
-theSilentForest.setTaxi(actions.Taxi(globals.player, "We must tread cautiously in these woods, " + str(globals.player) + ". If you need transit, I may be able to aid you. Where do you wish to travel?", [[theSilentForest, 0], [traineeValley, 9]]))
-theSilentForest.interactions.add(actions.OfferLocationChange(globals.player, "You spy a cave behind a crooked, dead tree. A faint clicking can be heard from within. Do you want to enter the cave?", [skeletonCave]), 0.015)
-skeletonCave.setTaxi(actions.Taxi(globals.player, "Do you want to retrace your steps and leave the dark cave?", [[skeletonCave, 0], [theSilentForest, 0]]))
-skeletonCave.interactions.add(actions.OfferLocationChange(globals.player, "An ominous darkness makes you shiver. In the distance, you see a large cavern occupied by a towering skeleton with a blue glowing sword. Do you want to enter the Damp Lair?", [dampLair]), 0.04, True)
-dampLair.setTaxi(actions.Taxi(globals.player, "You see a soft beam of light faintly in the distance. If you follow it, you'll make your way out of the skeleton cave. Do you want to leave?", [[dampLair, 0], [theSilentForest, 0]]))
+theSilentForest.setTaxi(actions.Taxi(player, "We must tread cautiously in these woods, " + str(player) + ". If you need transit, I may be able to aid you. Where do you wish to travel?", [[theSilentForest, 0], [traineeValley, 9]]))
+theSilentForest.interactions.add(actions.OfferLocationChange(player, "You spy a cave behind a crooked, dead tree. A faint clicking can be heard from within. Do you want to enter the cave?", [skeletonCave]), 0.015)
+skeletonCave.setTaxi(actions.Taxi(player, "Do you want to retrace your steps and leave the dark cave?", [[skeletonCave, 0], [theSilentForest, 0]]))
+skeletonCave.interactions.add(actions.OfferLocationChange(player, "An ominous darkness makes you shiver. In the distance, you see a large cavern occupied by a towering skeleton with a blue glowing sword. Do you want to enter the Damp Lair?", [dampLair]), 0.04, True)
+dampLair.setTaxi(actions.Taxi(player, "You see a soft beam of light faintly in the distance. If you follow it, you'll make your way out of the skeleton cave. Do you want to leave?", [[dampLair, 0], [theSilentForest, 0]]))
 
-fortMorning.setTaxi(actions.Taxi(globals.player, "If you wish to travel, sir, then there's no better than the Fort Morning Coach Company. Where to?", [[fortMorning, 0], [traineeValley, 4]]))
+fortMorning.setTaxi(actions.Taxi(player, "If you wish to travel, sir, then there's no better than the Fort Morning Coach Company. Where to?", [[fortMorning, 0], [traineeValley, 4]]))

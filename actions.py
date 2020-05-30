@@ -124,7 +124,7 @@ class Use(action.Action):
     def update(self):
         pass
 
-    def activate(self, optionalSecondArgument = None): # optionalSecondArgument is so Use can pass as an ability
+    def activate(self, optionalArgument1 = None, optionalArgument2 = None): # optionalArgument1 and optionalArgument2 are so Use can pass as an ability (caster, target)
         while True:
             use = input.inputFromOptions(self.name, ["back"] + self.player.inventory.getUsableItems())
             if use == "back":

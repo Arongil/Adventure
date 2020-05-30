@@ -31,4 +31,4 @@ class Monster(creature.Creature):
 
     def attack(self, target):
         self.gear.proc(target)
-        self.abilities.getOption(lambda ability: not ability.onCooldown()).activate(target)
+        self.abilities.getOption(lambda ability: not ability.onCooldown()).activate(self, target)
