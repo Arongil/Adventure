@@ -29,6 +29,7 @@ class Player(creature.Creature):
 
         self.states = {}
         self.classInspect = lambda: "" # additional combat information (ex. rogue could say "Stealthed" or mage could say "Mana 100/100")
+        self.classUpdate = lambda: None
 
         # The player starts at level 1.
         self.levelUpExperience = [
@@ -62,6 +63,8 @@ class Player(creature.Creature):
         self.states = classes.get_states(class_name)
         # extra inspect (i.e. "Stealthed" or "Mana 100/100")
         self.classInspect = classes.get_classInspect(class_name)
+        # update at the end of each turn (i.e. set stealth to false or regen mana)
+        self.classUpdate = classes.get_classUpdate(class_name)
 
     def updateActions(self):
         self.actions = self.baseActions + self.location.actions
@@ -80,6 +83,7 @@ class Player(creature.Creature):
         if self.alive == False:
             return
         self.update()
+        self.classUpdate(self)
         if action == None:
             input.inputFromOptions("turn", self.actions).activate()
         else:
@@ -106,7 +110,6 @@ class Player(creature.Creature):
             self.act()
         else: # Otherwise, execute the action.
             self.act(action)
-
 
     def changeLocation(self, newLocation):
         self.location.leave()
