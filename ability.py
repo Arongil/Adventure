@@ -42,4 +42,4 @@ def damage(ability, caster, target, lowerBound, upperBound):
 
 def heal(ability, caster, target, lowerBound, upperBound):
     amount = caster.recoverHealth(lowerBound + random() * (upperBound - lowerBound))
-    output.say("You restore " + output.formatNumber(amount) + " health to yourself with " + ability.name + "." if caster.isPlayer else caster.the + " restores " + output.formatNumber(amount) + " health to itself with " + ability.name + ".")
+    output.say("You restore " + output.formatNumber(amount) + " health to yourself with " + ability.name + "." if caster.isPlayer else caster.the.capitalize() + " restores " + output.formatNumber(amount) + " health to itself with " + ability.name + ".")

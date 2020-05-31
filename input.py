@@ -1,4 +1,16 @@
+from pynput import keyboard
+import globals
 import output
+
+# Automatically press <enter> after the user presses a key. That way they can type "12212" instead of "1 <enter> 2 <enter> 2 <enter> 1 <enter 2"
+controller = keyboard.Controller()
+def instant_input():
+    return globals.get_player().settings["instant-input"]
+def on_release(key):
+    if instant_input() and key is not keyboard.Key.enter:
+        controller.press(keyboard.Key.enter)
+listener = keyboard.Listener(on_release=on_release)
+listener.start()
 
 def isInt(n):
     try:

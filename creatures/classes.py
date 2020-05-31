@@ -165,13 +165,16 @@ def rogueInspect(player):
     return ' '.join(i[0] for i in displayInfo)
 
 def enterStealth(player):
-    player.states["stealth"] = True
-    # add dodge buff that will persist until it is removed upon unstealthing
-    player.addEffect( effect.DodgeBuff("stealth", duration=99999, amount=3, notify=False) )
+    if not player.states["stealth"]:
+        player.states["stealth"] = True
+        # add dodge buff that will persist until it is removed upon unstealthing
+        player.stats.dodge.mult(3)
 
 def exitStealth(player):
-    player.states["stealth"] = False
-    player.removeEffect( effect.DodgeBuff("stealth", duration=99999, amount=3, notify=False) )
+    if player.states["stealth"]:
+        player.states["stealth"] = False
+        # remove dodge buff
+        player.stats.dodge.mult(-3)
 
 def rogueUpdate(player):
     exitStealth(player)
@@ -255,9 +258,9 @@ classes["rogue"] = {
     "abilities": [ getStab() ],
     "levelBonus": [
         # ability, description, levelToGainAbility
-        [getPoisonDagger(), "Only usable if stealthed: concealed in the shadows, coat your dagger with poison to deal 6 to 9 damage per turn over 3 turns the next time you stab. Unstealths you.", 3],
-        [getSap(), "Only usable if stealthed: sap the enemy to reduce their damage output by 40% for 6 turns. It has a cooldown of 20 turns.", 6],
+        [getPoisonDagger(), "Only usable if stealthed: concealed in the shadows, coat your dagger with poison to deal 6 to 9 base damage per turn over 3 turns the next time you stab. Unstealths you.", 3],
+        [getSap(), "Only usable if stealthed: sap the enemy to reduce their damage output by 40% for 6 turns. It has a cooldown of 20 turns. Unstealths you.", 6],
         [getEmbraceShadows(), "Draw the shadows near, stealthing yourself and reducing all damage you take by 75% for 3 turns. It has a cooldown of 20 turns.", 9],
-        [getRollTheBones(), "Roll the bones puts the duel in the hands of fate, increasing your critical strike chance by 200% for 10 turns. It has a cooldown of 40 turns.", 12]
+        [getRollTheBones(), "Roll the bones puts the duel in the hands of fate, increasing your critical strike chance by 200% for 10 turns. It has a cooldown of 40 turns. Unstealths you.", 12]
     ]
 }

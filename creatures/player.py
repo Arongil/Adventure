@@ -15,7 +15,8 @@ class Player(creature.Creature):
 
         self.settings = {
             "auto-rest": True,
-            "auto-scavenge": True
+            "auto-scavenge": True,
+            "instant-input": True
         }
 
         # baseActions are actions the player can always take.
