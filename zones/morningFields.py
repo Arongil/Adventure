@@ -34,7 +34,7 @@ class Wolf(monster.Monster):
         monster.Monster.__init__(self, "wolf", 40, loot.Loot("the wolf", 2, 20, [
                 [item.Nothing(), 0.7],
                 [potions.HealthPotion("lean wolf flank", "its owner must not have had enough to eat", 2, 9, 6), 0.25],
-                [gear.Gloves("torn wolfhide gloves", "the coarse fabric seems vaguely glovelike", 8, 26, lambda creature: creature.stats.add(armor=2), lambda creature: creature.stats.add(armor=-2)), 0.05]
+                [gear.Gloves("torn wolfhide gloves", "the coarse fabric seems vaguely glovelike", sellCost=8, buyCost=26, stats={"armor": 2}), 0.05]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
             [ability.Ability("bite", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 2, 6)), 0.5],
@@ -66,7 +66,7 @@ class GraglisTheGremlin(monster.Monster):
                 output.say(wearer.the.capitalize() + "'s voodoo fetish begins wailing softly, disorienting " + target.the + ".")
                 target.addEffect( effect.StrengthBuff("voodoo stun", 2, -0.2) )
 
-        self.voodooFetish = gear.Trinket("voodoo fetish", "the force that governs voodoo is twisted and vague... only strange creatures commune with it well", 29, 99, lambda target: target.stats.add(criticalChance=0.1), lambda target: target.stats.add(criticalChance=-0.1), voodooFetishProc)
+        self.voodooFetish = gear.Trinket("voodoo fetish", "the force that governs voodoo is twisted and vague... only strange creatures commune with it well", sellCost=29, buyCost=99, stats={"criticalChance": 0.1}, proc=voodooFetishProc)
         monster.Monster.__init__(self, "Graglis the Gremlin", 80, loot.Loot("Graglis the Gremlin", 16, 140, [
                 [self.voodooFetish, 1]
             ]), [
@@ -151,7 +151,7 @@ class SorcererOutcast(monster.Monster):
                 [item.Nothing(), 0.4],
                 [item.UsableItem("mysterious green brew", "it could be poison, it could be eternal life, it could be stool softener", 9, 49, lambda target: target.addEffect( effect.SpiritBuff("heightened spirits", 20, 2) )), 0.2],
                 [item.Item("cryptic spellbook", "the writing looks hasty and is in an elvish tongue", 30, 99), 0.2],
-                [gear.Helmet("pointy black hat", "several patches mottle the hat, including a long seam directly above the brim", 19, 49, lambda creature: creature.stats.add(criticalChance=0.05), lambda creature: creature.stats.add(criticalChance=-0.05)), 0.2]
+                [gear.Helmet("pointy black hat", "several patches mottle the hat, including a long seam directly above the brim", sellCost=19, buyCost=49, stats={"criticalChance": 0.05}), 0.2]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
             [ability.Ability("frostbolt", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 8, 14)), 0.5],
@@ -177,7 +177,7 @@ class DoomPanda(monster.Monster):
     def __init__(self):
         monster.Monster.__init__(self, "doom panda", 500, loot.Loot("the doom panda", 260, 1, [
                 [item.UsableItem("big black potion", "this is undoubtedly some bad stuff", 1, 2, lambda target: target.addEffect( effect.StrengthBuff("strength of a doom panda", 8, 30) )), 0.5],
-                [gear.Weapon("The Black Scythe", "the sword of the doom panda", 1, 2, lambda target: target.stats.add(strength=10, criticalChance=0.1), lambda target: target.stats.add(strength=-10, criticalChance=-0.1)), 0.5]
+                [gear.Weapon("The Black Scythe", "the sword of the doom panda", sellCost=1, buyCost=2, stats={"strength": 10, "criticalChance": 0.1}), 0.5]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
             [ability.Ability("cuddle", 0, lambda ablty, caster, target: ability.heal(ablty, caster, target, 1, 5)), 0.9],
@@ -237,7 +237,7 @@ class SkeletonArcher(monster.Monster):
                 [item.Nothing(), 0.4],
                 [item.Item("cracked bone", "dirty gray with a scratch along its middle", 3, 9), 0.3],
                 [item.Item("unfeathered arrow", "its tip seems to be made of tempered brown clay", 4, 6), 0.2],
-                [gear.Boots("crude sabatons", "probably held together with mud and bone marrow", 15, 44, lambda target: target.stats.add(armor=2, criticalChance=0.02), lambda target: target.stats.add(armor=-2, criticalChance=-0.02)), 0.1]
+                [gear.Boots("crude sabatons", "probably held together with mud and bone marrow", sellCost=15, buyCost=44, stats={"armor": 2, "criticalChance": 0.02}), 0.1]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
             [ability.Ability("iron bolt", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 9, 14)), 0.5],
@@ -259,7 +259,7 @@ class Ghoul(monster.Monster):
         ])
 
 #################### W # A # R # N # I # N # G ####################
-LJN = gear.Weapon("Laker-Justin Nunchucks", "You can probably guess the words on each nunchuck", 1000, 1001, lambda target: target.stats.add(strength=1000000, criticalChance=1, criticalStrike=15, armor=1000), lambda target: target.stats.add(strength=-1000000, criticalChance=-1, criticalStrike=-15, armor=-1000))
+LJN = gear.Weapon("Laker-Justin Nunchucks", "You can probably guess the words on each nunchuck", sellCost=1000, buyCost=1001, stats={"strength": 1000000, "criticalChance": 1, "criticalStrike": 15, "armor": 1000})
 def addExp(caster, amount):
     caster.experience += amount
 expPotions = item.UsableItem("Experience Potion", "The devs shouldn't have added this one", 1000, 1001, lambda caster: addExp(caster, 2000), 99)
@@ -288,7 +288,8 @@ def getSkeletonCave():
             [actions.ScavengeGold(player, 2, 6), 0.9],
             [actions.FindItem(player, lambda drop: "While exploring the gloomy cave, you stumble across an small iron chest. You find " + str(drop) + ".", [
                 [potions.HealthPotion("health potion", "a ghoul might have taken a swig", 14, 49, 35), 0.6],
-                [gear.Trinket("misplaced femur", "where could its owner be?", 19, 59, lambda target: target.stats.add(health=20), lambda target: target.stats.add(health=-20)), 0.1]]), 0.1]
+                [gear.Trinket("misplaced femur", "where could its owner be?", sellCost=19, buyCost=59, stats={"health": 20}), 0.1]
+            ]), 0.1]
         ])
     ]
     skeletonCaveInteractions = [
@@ -318,7 +319,7 @@ class AricneaTheSly(monster.Monster):
                 amount = wearer.dealDamage(target, 10 + random.random() * 8)
                 output.say("Dark tendrils burst from Sting, crushing " + target.the + " and dealing " + output.formatNumber(amount) + " damage to it.")
 
-        self.sting = gear.Weapon("Sting, Bone Reaper", "Aricnea's blade pulses with an ineffable energy", 89, 299, lambda target: target.stats.add(strength=12, criticalStrike=0.8), lambda target: target.stats.add(strength=-12, criticalStrike=-0.8), stingProc)
+        self.sting = gear.Weapon("Sting, Bone Reaper", "Aricnea's blade pulses with an ineffable energy", sellCost=89, buyCost=299, stats={"strength": 12, "criticalStrike": 0.8}, proc=stingProc)
         monster.Monster.__init__(self, "Aricnea the Sly", 220, loot.Loot("Aricnea the Sly", 38, 1460, [
                 [item.Item("undead invasion plans", "someone at Fort Morning would want to see this", 9, 99), 1],
                 [self.sting, 1]
@@ -392,7 +393,7 @@ class UnholyOoze(monster.Monster):
     def __init__(self):
         monster.Monster.__init__(self, "unholy ooze", 60, loot.Loot("the unholy ooze", 2, 70, [
                 [item.Nothing(), 0.8],
-                [gear.Ring("unholy band", "an irregular loop formed from the hard core of an ancient ooze", 24, 99, lambda target: target.stats.add(criticalStrike=0.5, dodge=0.01), lambda target: target.stats.add(criticalStrike=-0.5, dodge=-0.01)), 0.2]
+                [gear.Ring("unholy band", "an irregular loop formed from the hard core of an ancient ooze", sellCost=24, buyCost=99, stats={"criticalStrike": 0.5, "dodge": 0.01}), 0.2]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
             [ability.Ability("spit slime", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 6, 10)), 0.7],
@@ -413,7 +414,7 @@ class UnholyOoze(monster.Monster):
 def boozeStainedWarglaivesProc(wearer, target):
     if random.random() < 0.15:
         target.addEffect( effect.DamageOverTime("contagious intoxication", 3, 4, 6, caster=wearer) )
-boozeStainedWarglaives = gear.Weapon("booze-stained warglaives", "they seriously smell like cheap whisky, but hey, they're warglaives!", 19, 31, lambda target: target.stats.add(armor=6, health=15), lambda target: target.stats.add(armor=-6, health=-15), boozeStainedWarglaivesProc)
+boozeStainedWarglaives = gear.Weapon("booze-stained warglaives", "they seriously smell like cheap whisky, but hey, they're warglaives!", sellCost=19, buyCost=31, stats={"strength": 6, "health": 5, "criticalChance": -0.02}, proc=boozeStainedWarglaivesProc)
 
 captainJorna = npc.NPC("Captain Jorna", "Fort Morning never pays its hardest workers enough. They give me a pittance, I tell you! It's barely enough to buy rations and drink.", [
     quest.Quest(
@@ -439,7 +440,7 @@ captainJorna = npc.NPC("Captain Jorna", "Fort Morning never pays its hardest wor
         "Niiiice jooob. Speeeaking o' which, do you haaave aaany cheap whiiisky fooor meee?\n\nOh, I waaas supppooooosed to give yooou somethin'. Okay, then, here yooou aaare. Now gooo awaaaay yooaauu nincompoop.",
         lambda player: player.checkAndRemove("cracked bone", 4),
         loot.Loot("Captain Jorna", 60, 1000, [
-            [gear.Chest("booze-stained cuirass", "all drunken trainees are required to wear it for their weekly shame sessions, but it's surprisingly strong", 23, 54, lambda target: target.stats.add(armor=6, health=15), lambda target: target.stats.add(armor=-6, health=-15)), 1],
+            [gear.Chest("booze-stained cuirass", "all drunken trainees are required to wear it for their weekly shame sessions, but it's surprisingly strong", sellCost=23, buyCost=54, stats={"armor": 6, "health": 15}), 1],
             [potions.HealthPotion("stale bread", "there's already a bite missing...", 1, 9, 12), 1],
             [boozeStainedWarglaives, 1]
         ], True),
@@ -460,12 +461,12 @@ morningWares = shop.Shop("Morning Wares", "Welcome to Morning Wares, traveller. 
     potions.HealthPotion("lesser health potion", "better than resting", 6, 19, 20),
     potions.HealthPotion("health potion", "an over-the-counter prescription for all dying heroes", 9, 29, 30),
     item.UsableItem("strength potion", "induces rage, overwhelming power, and possibly constipation", 7, 34, lambda target: target.addEffect( effect.StrengthBuffAdd("strength potion", 8, 6, stackable=True))),
-    gear.Weapon("old knife", "short, rusted, but sharp", 6, 24, lambda target: target.stats.add(strength=3), lambda target: target.stats.add(strength=-3)),
-    gear.Boots("leather boots", "they put a barrier between your feet and the ground", 12, 35, lambda target: target.stats.add(health=5, armor=3), lambda target: target.stats.add(health=-5, armor=-3))
+    gear.Weapon("old knife", "short, rusted, but sharp", sellCost=6, buyCost=24, stats={"strength": 3}),
+    gear.Boots("leather boots", "they put a barrier between your feet and the ground", sellCost=12, buyCost=35, stats={"health": 5, "armor": 3})
 ])
 villageArmory = shop.Shop("Village Armory", "You'll find weapons from across the land in the Village Armory.", [
-    gear.Gloves("dull chain gloves", "scratchy", 13, 52, lambda target: target.stats.add(armor=3, strength=3), lambda target: target.stats.add(armor=-3, strength=-3)),
-    gear.Helmet("green crown of healing", "warm to the touch, it inspires tender care and enhanced recovery", 19, 64, lambda target: target.stats.add(health=5, armor=1, spirit=4), lambda target: target.stats.add(health=-5, armor=-1, spirit=-4))
+    gear.Gloves("dull chain gloves", "scratchy", sellCost=13, buyCost=52, stats={"armor": 3, "strength": 3}),
+    gear.Helmet("green crown of healing", "warm to the touch, it inspires tender care and enhanced recovery", sellCost=19, buyCost=64, stats={"health": 5, "armor": 1, "spirit": 4})
 ])
 
 def getFortMorning():

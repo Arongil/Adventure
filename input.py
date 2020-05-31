@@ -6,8 +6,12 @@ import output
 controller = keyboard.Controller()
 def instant_input():
     return globals.get_player().settings["instant-input"]
+# Only instant-type for characters in [1,2,3,4,5,6,7,8,9]
+instant_keys = []
+for i in range(10):
+    instant_keys.append(keyboard.KeyCode(char=str(i)))
 def on_release(key):
-    if instant_input() and key is not keyboard.Key.enter:
+    if instant_input() and key in instant_keys:
         controller.press(keyboard.Key.enter)
 listener = keyboard.Listener(on_release=on_release)
 listener.start()
