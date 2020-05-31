@@ -28,31 +28,9 @@ def get_classIntro(class_name):
 
 # Current Classes: mage, rogue, paladin
 
-# structure: states (i.e. stealth or mana), classInspect (i.e. returns "Mana 100/100), stats, abilities (that player has at level 1), levelBonus (abilities player gains they level)
-'''
-classes["generic-example"] = {
-    "stats": stats.Stats(
-        health=100,
-        armor=0,
-        strength=0,
-        spirit=0,
-        criticalChance=0.1,
-        criticalStrike=2
-    ),
-    "abilities": [
-        # name, cooldown, cast logic (takes ablty, which means ability but can't be confused with the module, and target)
-        ability.Ability("punch", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 5, 15))
-    ],
-    "levelBonus": [
-        # [name, cooldown, cast logic (takes ablty, which means ability but can't be confused with the module, and target)], levelToGainAbility
-        [ability.Ability("fireball", 2, lambda ablty, caster, target: ability.damage(ablty, caster, target, 10, 20)), "Fireball burns the enemy between 10 and 20 base damage.", 3],
-        [ability.Ability("iron heart", 20, lambda ablty, caster, target: caster.addEffect( effect.ArmorBuff("iron heart", 4, 1) )), "Iron heart strengthens your resolve, halving the damage you take for four turns.", 8],
-        [ability.Ability("frenzy", 20, lambda ablty, caster, target: caster.addEffect( effect.StrengthBuff("frenzy", 6, 0.4) )), "Frenzy makes you wild and powerful, increasing the damage you deal by 40% for six turns.", 15]
-    ]
-}
-'''
-
 # MAGE
+
+# display after health during combat
 def mageInspect(player):
     return "Mana " + str(player.states["mana"]) + "/100"
 
@@ -104,6 +82,18 @@ def getScorch():
 
     return ability.Ability("scorch", cooldown=0, cast=scorchLogic, condition=available)
 
+def getPyroblast():
+    manaCost = 80
+    def available(player):
+        return player.states["mana"] >= manaCost
+
+    def pyroblastLogic(ablty, player, target):
+        consumeMana(player, manaCost)
+        regenMana(player)
+        ability.damage(ablty, player, target, 22, 30)
+
+    return ability.Ability("pyroblast", cooldown=8, cast=pyroblastLogic, condition=available)
+
 def getIceBarrier():
     manaCost = 50
     def available(player):
@@ -125,7 +115,7 @@ def getEvocate():
         player.states["mana"] = 100
         output.say("You evocate to refill your mana.")
 
-    return ability.Ability("evocate ", cooldown=40, cast=evocateLogic, condition=available)
+    return ability.Ability("evocate", cooldown=40, cast=evocateLogic, condition=available)
 
 classes["mage"] = {
     "states": {
@@ -149,7 +139,8 @@ classes["mage"] = {
         # ability, description, levelToGainAbility
         [getFrostbolt(), "Frostbolt freezes the enemy, dealing an average of 8 damage and reducing enemy's damage output by 15% for 3 turns. It costs 15 mana.", 3],
         [getScorch(), "Scorch burns the enemy, dealing 2 to 5 damage per turn over 8 turns. It costs 30 mana. Stackable.", 6],
-        [getIceBarrier(), "Ice barrier summons a shield around you that reduces incoming damage by 50% for 4 turns. It has a 20 turn cooldown and costs 50 mana.", 9],
+        [getPyroblast(), "Pyroblast clobbers the enemy with a gigantic fireball, dealing 22 to 30 damage. It costs 80 mana.", 8],
+        [getIceBarrier(), "Ice barrier summons a shield around you that reduces incoming damage by 50% for 4 turns. It has a 20 turn cooldown and costs 50 mana.", 10],
         [getEvocate(), "Evocate restores your mana to full. It has a 40 turn cooldown.", 12]
     ]
 }

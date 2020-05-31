@@ -241,7 +241,7 @@ class SkeletonArcher(monster.Monster):
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
             [ability.Ability("iron bolt", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 9, 14)), 0.5],
-            [ability.Ability("arrow as dagger", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 1, 3, 21)), 0.4],
+            [ability.Ability("arrow as dagger", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 3, 21)), 0.4],
             [ability.Ability("archer's resolve", 2, lambda ablty, caster, target: caster.addEffect( effect.CriticalChanceBuffAdd("archer's resolve", 2, 0.6) )), 0.1]
         ])
 
