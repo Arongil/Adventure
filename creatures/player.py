@@ -32,6 +32,8 @@ class Player(creature.Creature):
         self.classInspect = lambda: "" # additional combat information (ex. rogue could say "Stealthed" or mage could say "Mana 100/100")
         self.classUpdate = lambda: None
 
+        self.completedQuests = {}
+
         # The player starts at level 1.
         self.levelUpExperience = [
             # 2  3    4    5    6    7     8     9     10
@@ -76,6 +78,9 @@ class Player(creature.Creature):
                 i.changeTaxi(self.location.taxi)
                 return True
         return False
+
+    def hasCompleted(self, questName):
+        return questName in self.completedQuests
 
     def getInteraction(self):
         if not self.alive:
@@ -148,7 +153,9 @@ class Player(creature.Creature):
         if gameOver == "debug":
             self.alive = True
             self.health = 50
+            return
         # # # # # # # # # # # # # #
+        input.close()
 
     def attack(self, target):
         ability = input.inputFromOptions("attack", self.abilities, lambda ability: str(ability), lambda ability: ability.available(self), "That ability is not available right now.")

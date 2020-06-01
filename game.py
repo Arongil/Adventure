@@ -1,3 +1,4 @@
+import traceback
 import globals
 import input
 import output
@@ -24,5 +25,15 @@ class Game:
     def start(self):
         self.initGame()
         while self.player.alive:
-            self.player.act()
-            self.player.interact()
+            try:
+                self.player.act()
+                self.player.interact()
+            except Exception:
+                output.bar()
+                output.declare("! ERROR !")
+                output.bar()
+                output.bellow("Adventure has crashed. The program will quit after you answer this question. See Python traceback?")
+                if input.yesNo():
+                    traceback.print_exc()
+                break
+        input.close()

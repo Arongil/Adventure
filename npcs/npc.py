@@ -15,7 +15,7 @@ class NPC:
         self.quests = quests
 
     def getQuests(self):
-        return [quest for quest in self.quests if quest.condition(globals.player)]
+        return [quest for quest in self.quests if quest.condition(globals.get_player())]
 
     def getName(self):
         return self.name if len(self.getQuests()) == 0 else self.name + " *"

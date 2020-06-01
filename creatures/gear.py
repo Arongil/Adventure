@@ -50,7 +50,7 @@ class Slot(item.UsableItem):
 
         # add stats to the description (sorted alphabetically by stat name)
         for stat, value in sorted(self.stats.items(), key=lambda x: x[0]):
-            self.description += "\n\t" + stat + (" +" if value > 0 else " -") + output.formatNumber(value)
+            self.description += "\n\t" + stat + (" +" if value > 0 else " -") + output.formatNumber(value, 2)
 
     def equip(self, wearer):
         for stat, value in self.stats.items():

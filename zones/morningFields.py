@@ -32,8 +32,8 @@ class Wolf(monster.Monster):
 
     def __init__(self):
         monster.Monster.__init__(self, "wolf", 40, loot.Loot("the wolf", 2, 20, [
-                [item.Nothing(), 0.7],
-                [potions.HealthPotion("lean wolf flank", "its owner must not have had enough to eat", 2, 9, 6), 0.25],
+                [item.Nothing(), 0.65],
+                [potions.HealthPotion("lean wolf flank", "its owner must not have had enough to eat", 2, 9, 6), 0.3],
                 [gear.Gloves("torn wolfhide gloves", "the coarse fabric seems vaguely glovelike", sellCost=8, buyCost=26, stats={"armor": 2}), 0.05]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
@@ -88,6 +88,37 @@ class GraglisTheGremlin(monster.Monster):
         output.say("Graglis begins to dance frantically, screaming gibberish all the while. Black mist forms reptilian strands in the air.")
         self.addEffect( effect.StrengthBuffAdd("voodoo ritual", 6, 8) )
 
+oldHermit = npc.NPC("Old Hermit", "I see you've wandered your way on to an adventure in beautiful Morning Fields... that's as a good a reason as any for me to order you around.", [
+    quest.Quest(
+        "Mad Coiner",
+        "First name's Old and last name's Hermit. Why, adventurer, would you care to participate with me in a game of wits?\n\nScavenge around until you've found 10 gold, then deliver it to me and I shall give you 20 gold. What a deal for you, friend. Do be wary of the wolves that wander in these parts.",
+        "You have the gold yet? I'm no mad coiner, I'll certainly give you 20 gold back.",
+        "Ah, here we have the coins.\n\nOh, you really thought I'd give you any gold back? Ha! I'm a hermit, we don't live by an honor code.\n\nStop whining. Look, because of my good morals, I'll leave you with this rock I found. How's that?",
+        lambda player: player.inventory.removeGold(10),
+        loot.Loot("Old Hermit", gold=0, experience=150, items=[
+            [item.UsableItem("jagged rock", "what would happen if you smash it on yourself?", sellCost=1, buyCost=5, use=lambda target: target.addEffect( effect.DamageOverTime("smashed", 6, 1, 2, globals.get_player()) )), 1]
+        ]),
+        lambda player: True
+    ), quest.Quest(
+        "To the Brink and Back",
+        "I'm not strange. I'm normal, but everyone thinks I'm strange because they're crackpots.\n\nSometimes I stand near the skeleton cave in the Silent Forest just for the thrill, you know? Evil reanimated bones could kill you at any time -- that kind of excitement.\n\nWhy don't you go try it? Come back here severely injured, under 20 health. I'll brew something up for you to drink afterward while you're at it.",
+        "You're not nearly hurt enough! Go and break a leg. Literally. Get under 20 health.",
+        "Haha! The great adventurer returns to his hermit master at the lips of death, ready to return to life. That's how it's done.\n\nThe other adventurer who came down last week never returned -- his name was Jared if I recall -- and I found his bones outside the skeleton cave in the Silent Forest eaten clean. Who knows if he's been reanimated yet?\n\nOh, right. You should drink this. It'll make you feel better.",
+        lambda player: player.health < 20,
+        loot.Loot("Old Hermit", gold=0, experience=200, items=[
+            [potions.HealthPotion("frothy ale", "it looks like it has ground pebbles mixed in", sellCost=6, buyCost=19, amount=22), 1],
+        ]),
+        lambda player: player.hasCompleted("Mad Coiner")
+    ), quest.Quest(
+        "Wolfish Dinner",
+        "A hermit has got to eat! Would you mind bringing this dear, old, senile hermit a few wolf flanks so he can eat like a king for just one sad, lonely, gloomy night? Be a dear. Oh but not a deer! Wolves hunt those.\n\nFetch me 4 lean wolf flanks, will you?",
+        "I hear someone's stomach rumbling. Mine! Hurry up with the 4 wolf flanks.",
+        "At last, thy poor hermit may supper. Thank thee, fair adventurer friend. This deed worthies itself of gold untold, straight from a dragon's den!\n\nHow about two gold? That's about right, I think. Now get lost, sucker. Go to Fort Morning for all I care.",
+        lambda player: player.checkAndRemove("lean wolf flank", 4),
+        loot.Loot("Old Hermit", gold=2, experience=400),
+        lambda player: player.hasCompleted("To the Brink and Back")
+    )
+])
 def getTraineeValley():
     def enter():
         output.proclaim("Trainee Valley: Sparse trees occupy rolling expanses of lush grass. Fort Morning is barely visible in the distant north, while the Silent Forest looms to the east.")
@@ -106,7 +137,8 @@ def getTraineeValley():
             [actions.ScavengeGold(player, 0, 2), 0.98],
             # health, armor, strength, spirit, criticalChance, criticalStrike, dodge
             [shrine.StatShrine([20, 10, 10, 10, 0.1, 1, 0.2], 50), 0.02]
-        ])
+        ]),
+        actions.Talk(player, [oldHermit])
     ]
     traineeValleyInteractions = [
         [actions.Nothing(), 0.8],
@@ -418,12 +450,23 @@ boozeStainedWarglaives = gear.Weapon("booze-stained warglaives", "they seriously
 
 captainJorna = npc.NPC("Captain Jorna", "Fort Morning never pays its hardest workers enough. They give me a pittance, I tell you! It's barely enough to buy rations and drink.", [
     quest.Quest(
+        "Blasted Rats",
+        "Hail, adventurer! Fort Morning has never been the cleanest place, but the the number of rats scurrying about now it simply unacceptable. And they hoard those strange doubloons in their nests! Where do they even find them? But I digress.\n\nI hear you are of middling power, perhaps in the thirtieth percentile or so... do you think you are up to the task of culling their numbers?\n\nBring me one of the doubloons they hoard as proof. I hear they fetch a good price in the market, too.",
+        "You have the doubloon yet? Well go on and get them already!",
+        "You have the doubloon, good... good. Oh, interesting.\n\n*Captain Jorna examines the doubloon you handed her.*\n\nThis one seems to be enchanted. Keep it, please. I try to stay away from voodoo and the sort.",
+        lambda player: player.checkAndRemove("strange doubloon", 1),
+        loot.Loot("Captain Jorna", gold=30, experience=600, items=[
+            [gear.Trinket("enchanted doubloon", "a tiny engraving seems to depict a gremlin of some sort", sellCost=31, buyCost=59, stats={"criticalChance": 0.02, "dodge": 0.04}), 1]
+        ]),
+        lambda player: True
+    ),
+    quest.Quest(
         "Drunkards and Me",
         "The trainees are all out staggering and drunk at this time of year, trampling wildflowers and scaring away the rabbits. I don't get paid enough to go and round them up, of course. But I could probably figure something out for you if you went and taught them a lesson.\n\nGo to trainee valley and bring me three of their bottles of cheap whiskey to prove you've done your job, will you?",
         "Do you have the three bottles of whiskey yet? I'm getting jittery waiting.",
         "Wonderful! You have the whiskey right? Ah, here, perfect.\n\nAnd your compensation, how could I forget? All right, now you be off. Thanks for your help and all.",
         lambda player: player.checkAndRemove("cheap whiskey", 3),
-        loot.Loot("Captain Jorna", 40, 600, [
+        loot.Loot("Captain Jorna", gold=40, experience=800, items=[
             [item.UsableItem("mysterious box", "open it!", 1, 4, lambda target: target.inventory.addItem(
                 item.UsableItem("smaller mysterious box", "now you have to see what's inside", 1, 3, lambda target: target.inventory.addItem(
                     item.UsableItem("tiny mysterious box", "russian dolls confirmed", 1, 2, lambda target: target.inventory.addItem(
@@ -431,27 +474,27 @@ captainJorna = npc.NPC("Captain Jorna", "Fort Morning never pays its hardest wor
                     ))
                 ))
             )), 1]
-        ], True),
-        lambda player: True
+        ]),
+        lambda player: player.hasCompleted("Blasted Rats")
     ), quest.Quest(
         "The Bold Undead",
         "The skeletons are starting to form in larger groups in the Silent Forest. All my trainees are drunk, as you know, so I think we'll have to settle for you and your meager skills.\n\nThe skeletons will spare you no mercy, adventurer. Bring your strongest armor, and purchase health potions from the town shop to prepare yourself.\n\nGo to the Silent Forest and find the Skeleton Cave. From there, bring me four cracked bones from the skeletons to prove your deeds and worth.",
-        "Have you killed them skellers yetters? I'm sober fur suuure, why doo you ask?",
+        "Have you killed them skellers yetters? I'm sober fur suuure, why doo you ask? Bring meee dooze foour bones pleeeaase.",
         "Niiiice jooob. Speeeaking o' which, do you haaave aaany cheap whiiisky fooor meee?\n\nOh, I waaas supppooooosed to give yooou somethin'. Okay, then, here yooou aaare. Now gooo awaaaay yooaauu nincompoop.",
         lambda player: player.checkAndRemove("cracked bone", 4),
-        loot.Loot("Captain Jorna", 60, 1000, [
+        loot.Loot("Captain Jorna", gold=80, experience=1400, items=[
             [gear.Chest("booze-stained cuirass", "all drunken trainees are required to wear it for their weekly shame sessions, but it's surprisingly strong", sellCost=23, buyCost=54, stats={"armor": 6, "health": 15}), 1],
             [potions.HealthPotion("stale bread", "there's already a bite missing...", 1, 9, 12), 1],
             [boozeStainedWarglaives, 1]
-        ], True),
-        lambda player: player.level >= 5
+        ], dropAll=True),
+        lambda player: player.hasCompleted("Drunkards and Me")
     ), quest.Quest(
         "Invasion",
         "", # This quest is only visible if it's already completed, so no need for original text.
         "",
         "You found an invasion map, eh? Let me see what we have coming at us.\n\n*Captain Jorna scans the torn page. Her eyes widen halfway through.*\n\nThe undead plan to come tonight. They have a northern siege engine, too, by the looks of this diagram. Thank you for bringing me this.",
         lambda player: player.checkAndRemove("undead invasion plans", 1),
-        loot.Loot("Captain Jorna", 80, 1200, []),
+        loot.Loot("Captain Jorna", 80, 1200),
         lambda player: player.has("undead invasion plans", 1),
         True # the True here signifies that this quest can jump straight to completion if the condition is satisfied, which it will be if the player is seeing the quest
     )
@@ -494,6 +537,8 @@ def getFortMorning():
         [fight.Fight(getMonster), 0.07]
     ]
     return location.Location("Fort Morning", enter, exit, fortMorningActions, fortMorningInteractions)
+
+# Instantiate locations.
 
 traineeValley = getTraineeValley()
 

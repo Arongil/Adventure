@@ -15,6 +15,8 @@ def on_release(key):
         controller.press(keyboard.Key.enter)
 listener = keyboard.Listener(on_release=on_release)
 listener.start()
+def close():
+    listener.stop()
 
 def isInt(n):
     try:

@@ -32,7 +32,7 @@ class Quest:
         return self.name if not self.given else self.name + " (in progress)"
 
     def activate(self):
-        output.proclaim(self.name)
+        output.proclaim("-- " + self.name + " --")
 
         if self.autoGive:
             self.given = True
@@ -44,10 +44,12 @@ class Quest:
                 self.given = True
             return
 
-        if self.completionCheck(globals.player):
+        player = globals.get_player()
+        if self.completionCheck(player):
             output.proclaim(self.completeText)
             output.exclaim("You have completed the quest " + self.name + "!")
             self.rewards.activate()
             self.condition = lambda player: False
+            player.completedQuests[self.name] = True
         else:
             output.proclaim(self.incompleteText)
