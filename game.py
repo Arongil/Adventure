@@ -35,5 +35,6 @@ class Game:
                 output.bellow("Adventure has crashed. The program will quit after you answer this question. See Python traceback?")
                 if input.yesNo():
                     traceback.print_exc()
+                    input.getInput("end")
                 break
         input.close()

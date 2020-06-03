@@ -20,12 +20,12 @@ def bar():
 def separate():
     print("")
 
+powers = [10**i for i in range(0, 10)]
+invPowers = [10**(-i) for i in range(0, 10)]
 def formatNumber(n, digits=1):
-    integerDiff = abs(n) - int(abs(n))
-    if integerDiff < 10**(-digits):
+    if abs(int(n) - n) < invPowers[digits]:
         return str(int(n))
-    else:
-        return str(round(n, digits))
+    return str(int(n * powers[digits]) / powers[digits])
 
 # If necessary, a map between options and strings can be passed. By default, this map is just str.
 def outputList(options, mapOption = lambda option: str(option)):

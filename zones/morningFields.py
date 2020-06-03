@@ -66,7 +66,7 @@ class GraglisTheGremlin(monster.Monster):
                 output.say(wearer.the.capitalize() + "'s voodoo fetish begins wailing softly, disorienting " + target.the + ".")
                 target.addEffect( effect.StrengthBuff("voodoo stun", 2, -0.2) )
 
-        self.voodooFetish = gear.Trinket("voodoo fetish", "the force that governs voodoo is twisted and vague... only strange creatures commune with it well", sellCost=29, buyCost=99, stats={"criticalChance": 0.1}, proc=voodooFetishProc)
+        self.voodooFetish = gear.Trinket("voodoo fetish", "the force that governs voodoo is twisted and vague... only strange creatures commune with it well", sellCost=29, buyCost=99, stats={"criticalChance": 0.05}, proc=voodooFetishProc)
         monster.Monster.__init__(self, "Graglis the Gremlin", 80, loot.Loot("Graglis the Gremlin", 16, 140, [
                 [self.voodooFetish, 1]
             ]), [

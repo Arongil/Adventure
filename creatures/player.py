@@ -31,6 +31,7 @@ class Player(creature.Creature):
         self.states = {}
         self.classInspect = lambda: "" # additional combat information (ex. rogue could say "Stealthed" or mage could say "Mana 100/100")
         self.classUpdate = lambda: None
+        self.combatUpdate = lambda: None
 
         self.completedQuests = {}
 
@@ -68,6 +69,8 @@ class Player(creature.Creature):
         self.classInspect = classes.get_classInspect(class_name)
         # update at the end of each turn (i.e. set stealth to false or regen mana)
         self.classUpdate = classes.get_classUpdate(class_name)
+        # update at the end of each turn of combat (i.e. regen mana for mage)
+        self.combatUpdate = classes.get_combatUpdate(class_name)
         # output class information
         output.proclaim(classes.get_classIntro(class_name))
 
@@ -162,3 +165,4 @@ class Player(creature.Creature):
         output.separate()
         self.gear.proc(target)
         ability.activate(self, target)
+        self.combatUpdate(self)
