@@ -37,8 +37,8 @@ class Wolf(monster.Monster):
                 [gear.Gloves("torn wolfhide gloves", "the coarse fabric seems vaguely glovelike", sellCost=8, buyCost=26, stats={"armor": 2}), 0.05]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("bite", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 2, 6)), 0.5],
-            [ability.Ability("snap", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 4, 8)), 0.3],
+            [ability.Ability("bite", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 2, 5)), 0.5],
+            [ability.Ability("snap", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 4, 7)), 0.3],
             [ability.Ability("lick wounds", 2, lambda ablty, caster, target: ability.heal(ablty, caster, target, 4, 10)), 0.2]
         ])
 
@@ -50,7 +50,7 @@ class DrunkenTrainee(monster.Monster):
                 [item.UsableItem("cheap whiskey", "it's nearly empty", 5, 19, lambda target: target.addEffect( effect.DamageOverTime("intoxication", 3, 1, 2, self) )), 0.6]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("charge", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 6, 10)), 0.5],
+            [ability.Ability("charge", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 5, 9)), 0.5],
             [ability.Ability("stumble", 0, lambda ablty, caster, target: self.stumble()), 0.3],
             [ability.Ability("vomit", 4, lambda ablty, caster, target: target.addEffect( effect.DamageOverTime("intoxicated vomit", 2, 3, 5, self) )), 0.2]
         ])
@@ -71,7 +71,7 @@ class GraglisTheGremlin(monster.Monster):
                 [self.voodooFetish, 1]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("hop and scratch", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 7, 16)), 0.5],
+            [ability.Ability("hop and scratch", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 7, 14)), 0.5],
             [ability.Ability("mutter nonsense", 0, lambda ablty, caster, target: self.mutterNonsense()), 0.3],
             [ability.Ability("voodoo", 6, lambda ablty, caster, target: self.voodoo()), 0.2]
         ], dodge=0.15, unique=True)
@@ -451,7 +451,7 @@ boozeStainedWarglaives = gear.Weapon("booze-stained warglaives", "they seriously
 captainJorna = npc.NPC("Captain Jorna", "Fort Morning never pays its hardest workers enough. They give me a pittance, I tell you! It's barely enough to buy rations and drink.", [
     quest.Quest(
         "Blasted Rats",
-        "Hail, adventurer! Fort Morning has never been the cleanest place, but the the number of rats scurrying about now it simply unacceptable. And they hoard those strange doubloons in their nests! Where do they even find them? But I digress.\n\nI hear you are of middling power, perhaps in the thirtieth percentile or so... do you think you are up to the task of culling their numbers?\n\nBring me one of the doubloons they hoard as proof. I hear they fetch a good price in the market, too.",
+        "Hail, adventurer! Fort Morning has never been the cleanest place, but the the number of rats scurrying about now is simply unacceptable. And they hoard those strange doubloons in their nests! Where do they even find them? But I digress.\n\nI hear you are of middling power, perhaps in the thirtieth percentile or so... do you think you are up to the task of culling their numbers?\n\nBring me one of the doubloons they hoard as proof. I hear they fetch a good price in the market, too.",
         "You have the doubloon yet? Well go on and get them already!",
         "You have the doubloon, good... good. Oh, interesting.\n\n*Captain Jorna examines the doubloon you handed her.*\n\nThis one seems to be enchanted. Keep it, please. I try to stay away from voodoo and the sort.",
         lambda player: player.checkAndRemove("strange doubloon", 1),
@@ -551,7 +551,7 @@ fortMorning = getFortMorning()
 # Add connections between locations. It's always free to stay put.
 # TAXI STRATEGY: keep prices low so players are motivated to do quests that require travel. Players are implicitly motivated to not travel to zones out of their level range, where the monsters could easily kill them.
 traineeValley.setTaxi(actions.Taxi(player, "Hello, " + str(player) + ". I hear you'd like to travel. What can I do for you?", [[traineeValley, 0], [fortMorning, 4], [theSilentForest, 9]]))
-traineeValley.interactions.add(actions.OfferLocationChange(player, "A merchant's caravan approaches you. Its leader asks whether you want a ride to Fort Morning, where they are heading to sell western fish. Do you want to travel with them?", [fortMorning]), 0.01)
+# traineeValley.interactions.add(actions.OfferLocationChange(player, "A merchant's caravan approaches you. Its leader asks whether you want a ride to Fort Morning, where they are heading to sell western fish. Do you want to travel with them?", [fortMorning]), 0.01)
 
 theSilentForest.setTaxi(actions.Taxi(player, "We must tread cautiously in these woods, " + str(player) + ". If you need transit, I may be able to aid you. Where do you wish to travel?", [[theSilentForest, 0], [traineeValley, 9]]))
 theSilentForest.interactions.add(actions.OfferLocationChange(player, "You spy a cave behind a crooked, dead tree. A faint clicking can be heard from within. Do you want to enter the cave?", [skeletonCave]), 0.015)
