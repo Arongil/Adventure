@@ -3,7 +3,7 @@ A text-based adventure game. Download Python 3, download this, run `pip install 
 
 ## Features
 
-* Play as mage or rogue
+* Play as mage, rogue, or paladin
 * Level up to learn new abilities
 * Explore three unique locations
 * Fight monsters and complete quests
