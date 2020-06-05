@@ -15,13 +15,13 @@ class Fight(interaction.Interaction):
         output.bar()
         output.declare("You have been attacked by " + self.monster.a + "!")
         output.bar()
-    
+
     def tick(self):
         output.say(self.player.inspect())
         output.say(self.monster.inspect())
         self.player.attack(self.monster)
-        self.monster.attack(self.player)
         self.player.update()
+        self.monster.attack(self.player)
         self.monster.update()
         output.separate()
 
@@ -31,6 +31,6 @@ class Fight(interaction.Interaction):
             self.monster.die()
         else:
             self.player.die()
-    
+
     def exit(self):
         return self.player.health <= 0 or self.monster.health <= 0

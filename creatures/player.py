@@ -71,6 +71,16 @@ class Player(creature.Creature):
         self.classUpdate = classes.get_classUpdate(class_name)
         # update at the end of each turn of combat (i.e. regen mana for mage)
         self.combatUpdate = classes.get_combatUpdate(class_name)
+
+        # get difficulty before outputting class info
+        output.proclaim("What difficulty level do you want?")
+        difficulty = input.inputFromOptions("difficulty", ["easy", "medium", "hard", "expert"])
+        modifier = {"easy": 1.2, "medium": 1.0, "hard": 0.8, "expert": 0.5}[difficulty]
+        self.stats.health.value *= modifier
+        self.stats.strength.value *= modifier
+        self.stats.armor.value *= modifier
+        self.health = self.stats.health.getValue()
+
         # output class information
         output.proclaim(classes.get_classIntro(class_name))
 
@@ -155,7 +165,7 @@ class Player(creature.Creature):
         # # # # # # # # # # # # # #
         if gameOver == "debug":
             self.alive = True
-            self.health = 50
+            self.health = 1
             return
         # # # # # # # # # # # # # #
         input.close()

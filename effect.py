@@ -24,21 +24,21 @@ class Effect:
             self.start(target)
             if self.notify:
                 output.say(self.startNotification(target))
-        elif self.count > self.duration:
+        elif self.count >= self.duration:
             self.end(target)
             target.effects.remove(self)
             if self.notify:
                 output.say(self.endNotification(target))
-        else:
-            self.tick(target)
+            return
+        self.tick(target)
         self.count = self.count + 1
 
-# STAT BUFFS
+# stat buffs
 
 class HealthBuff(Effect):
 
     def __init__(self, name, duration, amount, stackable=False, notify=True):
-        Effect.__init__(self, name, duration,
+        effect.__init__(self, name, duration,
                 lambda target: self.addHealth(target),
                 lambda target: self.removeHealth(target),
                 lambda target: None,

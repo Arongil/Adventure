@@ -126,7 +126,7 @@ classes["mage"] = {
     "combatUpdate": mageCombatUpdate,
     "classIntro": "Mages are spell-casters. This uses mana, which ranges from 0 to 100. Cheaper spells let a mage recover mana so the mage can cast expensive spells when necessary. Mages recover 10 mana per turn, increased by a higher spirit stat. FIREBALL does an average of 10 damage and costs 10 mana.",
     "stats": stats.Stats(
-        health=60,
+        health=80,
         armor=0,
         strength=0,
         spirit=0,
@@ -188,8 +188,8 @@ def getStab():
         # stab takes the player out of stealth
         exitStealth(player)
 
-        # stab also has 30% to put the player in stealth
-        if random.random() < 0.3:
+        # stab also has a chance (increased with dodge) to put the player in stealth
+        if random.random() < 0.25 + player.stats.dodge.value:
             enterStealth(player)
             output.declare("Stab triggers stealth!")
 
@@ -239,7 +239,7 @@ classes["rogue"] = {
     "classInspect": rogueInspect,
     "classUpdate": rogueUpdate,
     "combatUpdate": rogueCombatUpdate,
-    "classIntro": "Rogues are quick and adept in poisons. Their abilities are enhanced when they are in stealth. STAB does an average of 10 damage (15 while stealthed), and it has a 30% chance to put a rogue in stealth. Rogues are 4x as likely to dodge while stealthed.",
+    "classIntro": "Rogues are quick and adept in poisons. Their abilities are enhanced when they are in stealth. STAB does an average of 10 damage (15 while stealthed), and it has a 25% chance to put a rogue in stealth, increased by 1% per point of dodge. Rogues are 4x as likely to dodge while stealthed.",
     "stats": stats.Stats(
         health=100,
         armor=0,

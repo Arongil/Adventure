@@ -1,23 +1,51 @@
-def say(string):
-    print(string)
+# cut off print after some point, but never over a word
+def _printNoCutoff(string, prefix, cutoff):
+    lines = []
+    words = string.split(" ")
+    curLength = 0
+    lineStart = 0
+    for i, word in enumerate(words):
+        l = len(str(word)) + 1 # add 1 for the space
+        curLength += l
+        if curLength > cutoff:
+            lines.append(" ".join(words[lineStart:i]))
+            lineStart = i
+            curLength = l
+    lines.append(" ".join(words[lineStart:]))
+    for line in lines:
+        print(prefix + line)
 
-def declare(string):
-    print("\t" + string)
-
-def exclaim(string):
-    print("\n\t" + string)
-
-def bellow(string):
-    print("\n\t" + string + "\n")
-
-def proclaim(string):
-    print("\n" + string)
-
-def bar():
-    print("_" * 75)
-    print("")
+def printNoCutoff(string, prefix="", cutoff=100):
+    if prefix == "\t":
+        cutoff -= 8
+    blocks = str(string).split("\n")
+    for block in blocks:
+        _printNoCutoff(block, prefix, cutoff)
 
 def separate():
+    print("")
+
+def say(string):
+    printNoCutoff(string)
+
+def declare(string):
+    printNoCutoff(string, prefix="\t")
+
+def exclaim(string):
+    separate()
+    printNoCutoff(string, prefix="\t")
+
+def bellow(string):
+    separate()
+    printNoCutoff(string, prefix="\t")
+    separate()
+
+def proclaim(string):
+    separate()
+    printNoCutoff(string)
+
+def bar():
+    print("_" * 100)
     print("")
 
 powers = [10**i for i in range(0, 10)]
