@@ -22,7 +22,7 @@ class Quit(action.Action):
         output.say("Are you sure you want to quit?")
         if input.yesNo():
             self.player.alive = False
-            output.exclaim("Thank you for playing!")
+            output.bellow("Thank you for playing!")
 
 class Settings(action.Action):
 
@@ -37,6 +37,27 @@ class Settings(action.Action):
                 break
             self.player.settings[option] = not self.player.settings[option]
             output.proclaim(str(option).capitalize() + " toggled to " + str(self.player.settings[option]) + ".")
+
+class Help(action.Action):
+
+    def __init__(self, player):
+        action.Action.__init__(self, "help", player)
+
+    def activate(self):
+        help = [
+            "Welcome to Adventure!",
+            "Your goal is to stay alive in this uncompromising world. While you're at it, you will fight monsters, level up, and complete quests. Here's a quick overview of how it all works.",
+            "REST AND SCAVENGE:\nThe main two actions you'll take are to rest (recover health) and scavenge (look for gold). You'll want to recover your health after fighting monsters so you aren't weak when the next one attacks you. You'll need gold to buy items from different shops, so save up.",
+            "COMBAT:\nMonsters will attack you at random in different zones. When you're fighting, you can cast your abilities or use an item. You attack, then the monster attacks. The first to die concludes the fight. Defeating a monster will reward gold, experience, and possibly items. You can navigate to your inventory in the menu to see descriptions of items.",
+            "LEVELS:\nAs you fight monsters and gain experience, you will level up. This restores you to full health and gives you the option to increase a stat by a small increment. Every few levels, you will learn a new ability depending on your class.",
+            "STATS:\nYou have seven stats. Health is your maximum health. Armor reduces damage taken. Strength increases damage done. Spirit increases healing. Critical strike chance and critical strike damage modify the frequency and potency of critical hits. Dodge increases the chance of fully dodging incoming damage. Armor, strength, and spirit all operate on a 20-point scale, which means that the first 20 points of strength you get doubles the damage you do.",
+            "GEAR:\nQuests give gear, and monsters drop it. Equipping it makes you stronger. Opening your inventory displays the specific stats a piece of gear has. Certain items also have procs, which are events that occur at random when they are equipped. For example, a weapon might have a proc that triggers on 5% of your attacks that deals 5 damage. There are eight types of gear: weapon, helmet, chest, gloves, legs, boots, ring, trinket. You can wear one piece of each type of gear at once.",
+            "QUESTS:\nQuestgivers scattered across different zones will reward you for completing certain objectives. Find them under the 'talk' option. Completing a quest always gives experience, and it often gives gold and special items as well.",
+            "TRAVEL:\nUnder the 'taxi' option in the menu, you can travel between locations. New areas may have more powerful monsters, so be sure to level up enough before you go.",
+            "CLASSES:\nYou choose a class when you first start the game. Each class is centered around a certain theme: for example, mages have mana, rogues can stealth, and paladins have holy power. Each class has a different set of abilities that it unlocks as it levels up.",
+            "DIFFICULTY LEVEL:\nAt the start of the game you choose to play either easy, normal, expert, master, or torment mode. Each mode either boosts or lowers your health, strength, and armor. For example, hard mode cuts each by 10%. Normal mode leaves all your stats the same."
+        ]
+        output.bellow("\n\n".join(help))
 
 class Stats(action.Action):
 
@@ -99,6 +120,7 @@ class Menu(action.Action):
             Stats(self.player),
             Inventory(self.player),
             Settings(self.player),
+            Help(self.player),
             Quit(self.player)
         ]
 
@@ -154,8 +176,8 @@ class LevelBonus(action.Action):
         stats = self.player.stats.getStats()
         output.say("Which stat do you want to boost?")
         while True:
-            stat = input.inputFromOptions(self.name, stats, lambda stat: stat.name + " by " + str(self.bonuses[stat.name]) + ", currently at " + str(stat) + ".")
-            output.say("Are you sure you want to boost " + str(stat.name) + " by " + str(self.bonuses[stat.name]) + "?")
+            stat = input.inputFromOptions(self.name, stats, lambda stat: stat.name + " by " + str(self.bonuses[stat.name]*stat.difficultyModifier) + ", currently at " + str(stat) + ".")
+            output.say("Are you sure you want to boost " + str(stat.name) + " by " + str(self.bonuses[stat.name]*stat.difficultyModifier) + "?")
             if input.yesNo():
                 stat.add(self.bonuses[stat.name])
                 break

@@ -8,16 +8,17 @@ class Stat:
         self.base = base
         self.addition = 0
         self.multiplication = 1
+        self.difficultyModifier = 1
 
     def __str__(self):
         # use two decimals of precision for stats
-        return output.formatNumber( (self.value + self.base + self.addition) * self.multiplication - self.base, 2 )
+        return output.formatNumber( ( (self.value + self.base + self.addition) * self.multiplication - self.base) * self.difficultyModifier, 2 )
 
     def percent(self):
-        return output.formatNumber( ( (self.value + self.base + self.addition) * self.multiplication - self.base ) * 100 )
+        return output.formatNumber( ( (self.value + self.base + self.addition) * self.multiplication - self.base ) * 100 * self.difficultyModifier)
 
     def getValue(self):
-        return (self.value + self.base + self.addition) * self.multiplication
+        return (self.value + self.base + self.addition) * self.multiplication * self.difficultyModifier
 
     def add(self, amount):
         self.addition += amount

@@ -3,6 +3,8 @@ import output
 import frequencyList as fList
 import creatures.creature as creature
 import creatures.classes as classes
+import creatures.gear as gear
+import item
 import ability
 import actions
 import effect
@@ -52,13 +54,23 @@ class Player(creature.Creature):
         self.unique = False
         self.alive = True
 
+    def debug(self):
+        #################### W # A # R # N # I # N # G ####################
+        LJN = gear.Weapon("Laker-Justin Nunchucks", "You can probably guess the words on each nunchuck", sellCost=1000, buyCost=1001, stats={"strength": 1000000, "criticalChance": 1, "criticalStrike": 15, "armor": 1000})
+        def addExp(caster, amount):
+            caster.experience += amount
+        expPotions = item.UsableItem("Experience Potion", "The devs shouldn't have added this one", 1000, 1001, lambda caster: addExp(caster, 2000), 99)
+        self.inventory.addItem(LJN)
+        self.inventory.addItem(expPotions)
+        self.inventory.addGold(999999)
+        ###################### D # A # N # G # E # R ######################
+
     def init(self):
         # initialize player's class (e.g. mage)
         output.say("What class do you want to play?")
         class_name = input.inputFromOptions("class", classes.get_classes())
         # base stats
         self.stats = classes.get_stats(class_name)
-        self.health = self.stats.health.getValue()
         # abilities for level 1
         self.abilities = self.abilities + classes.get_abilities(class_name)
         # abilities for higher levels
@@ -74,11 +86,16 @@ class Player(creature.Creature):
 
         # get difficulty before outputting class info
         output.proclaim("What difficulty level do you want?")
-        difficulty = input.inputFromOptions("difficulty", ["easy", "medium", "hard", "expert"])
-        modifier = {"easy": 1.2, "medium": 1.0, "hard": 0.8, "expert": 0.5}[difficulty]
-        self.stats.health.value *= modifier
-        self.stats.strength.value *= modifier
-        self.stats.armor.value *= modifier
+        difficulty = input.inputFromOptions("difficulty", ["easy", "normal", "hard", "expert", "master", "torment"], debug=True)
+        if difficulty == "debug":
+            self.debug()
+            output.bellow("GOD MODE ENABLED.")
+            output.say("What difficulty level do you want?")
+            difficulty = input.inputFromOptions("difficulty", ["easy", "normal", "hard", "expert", "master", "torment"])
+        modifier = {"easy": 1.2, "normal": 1.0, "hard": 0.9, "expert": 0.8, "master": 0.7, "torment": 0.6}[difficulty]
+        self.stats.health.difficultyModifier = modifier
+        self.stats.strength.difficultyModifier = modifier
+        self.stats.armor.difficultyModifier = modifier
         self.health = self.stats.health.getValue()
 
         # output class information

@@ -253,8 +253,9 @@ class SkeletonWarrior(monster.Monster):
 
     def __init__(self):
         monster.Monster.__init__(self, "skeleton warrior", 60, loot.Loot("the skeleton warrior", 4, 80, [
-                [item.Nothing(), 0.6],
-                [item.Item("cracked bone", "dirty gray with a scratch along its middle", 3, 9), 0.4]
+                [item.Nothing(), 0.4],
+                [item.Item("cracked bone", "dirty gray with a scratch along its middle", 3, 9), 0.4],
+                [gear.Chest("frayed mail vest", "at least three holes in the front", sellCost=9, buyCost=39, stats={"armor": 4}), 0.2]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
             [ability.Ability("charge", 999, lambda ablty, caster, target: ability.damage(ablty, caster, target, 9, 16)), 999],
@@ -290,17 +291,6 @@ class Ghoul(monster.Monster):
             [ability.Ability("putrid breath", 5, lambda ablty, caster, target: target.addEffect( effect.ArmorBuff("putrid breath", 4, -0.3) )), 0.3]
         ])
 
-#################### W # A # R # N # I # N # G ####################
-LJN = gear.Weapon("Laker-Justin Nunchucks", "You can probably guess the words on each nunchuck", sellCost=1000, buyCost=1001, stats={"strength": 1000000, "criticalChance": 1, "criticalStrike": 15, "armor": 1000})
-def addExp(caster, amount):
-    caster.experience += amount
-expPotions = item.UsableItem("Experience Potion", "The devs shouldn't have added this one", 1000, 1001, lambda caster: addExp(caster, 2000), 99)
-if globals.debug:
-    player.inventory.addItem(LJN)
-    player.inventory.addItem(expPotions)
-    player.inventory.addGold(999999)
-###################### D # A # N # G # E # R ######################
-
 def getSkeletonCave():
     def enter():
         output.proclaim("Skeleton Cave: The stone walls smell of rotted flesh. Something here chafes with life.")
@@ -319,7 +309,7 @@ def getSkeletonCave():
         actions.Scavenge(player, [
             [actions.ScavengeGold(player, 2, 6), 0.9],
             [actions.FindItem(player, lambda drop: "While exploring the gloomy cave, you stumble across an small iron chest. You find " + str(drop) + ".", [
-                [potions.HealthPotion("health potion", "a ghoul might have taken a swig", 14, 49, 35), 0.6],
+                [potions.HealthPotion("viscous health potion", "a ghoul might have taken a swig", 14, 49, 35), 0.6],
                 [gear.Trinket("misplaced femur", "where could its owner be?", sellCost=19, buyCost=59, stats={"health": 20}), 0.1]
             ]), 0.1]
         ])

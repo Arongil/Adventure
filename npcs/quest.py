@@ -39,10 +39,17 @@ class Quest:
 
         if not self.given:
             output.proclaim(self.openerText)
-            choice = input.inputFromOptions("quest", ["accept", "decline"])
-            if choice == "accept":
-                self.given = True
+            while True:
+                choice = input.inputFromOptions("quest", ["decline", "accept"])
+                if choice == "accept":
+                    self.given = True
+                    break
+                elif choice == "decline":
+                    output.say("Are you sure you want to decline the quest?")
+                    if input.yesNo():
+                        break
             return
+
 
         player = globals.get_player()
         if self.completionCheck(player):

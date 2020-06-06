@@ -36,12 +36,14 @@ def getInt(prompt, lowerBound, upperBound):
     return int(choice)
 
 # Get input from a list of options. Special logic for how to display the option can be passed, and if necessary, a function can be passed that returns whether an option is valid.
-def inputFromOptions(prompt, options, mapOption = lambda option: str(option), condition = lambda option: True, warning = ""):
+def inputFromOptions(prompt, options, mapOption = lambda option: str(option), condition = lambda option: True, warning = "", debug=False):
     if len(options) == 0:
         return None
     output.outputList(options, mapOption)
     choice = getInput(prompt)
     while not isInt(choice) or int(choice) > len(options) or int(choice) < 1 or not condition(options[int(choice) - 1]):
+        if debug and choice == "debug":
+            return "debug"
         if not isInt(choice) or int(choice) > len(options) or int(choice) < 1:
             output.say("Please enter an integer between 1 and " + str(len(options)) + ".")
         else:
