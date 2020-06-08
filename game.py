@@ -21,6 +21,7 @@ class Game:
 
         self.player.init()
         self.player.changeLocation(morningFields.traineeValley)
+        self.player.reviveLocation = morningFields.traineeValley
 
     def start(self):
         self.initGame()

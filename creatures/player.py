@@ -18,7 +18,8 @@ class Player(creature.Creature):
         self.settings = {
             "auto-rest": True,
             "auto-scavenge": True,
-            "instant-input": True
+            "instant input": True,
+            "permadeath": False
         }
 
         # baseActions are actions the player can always take.
@@ -66,6 +67,8 @@ class Player(creature.Creature):
         ###################### D # A # N # G # E # R ######################
 
     def init(self):
+        # THREE STEPS: class, difficulty, mode
+
         # initialize player's class (e.g. mage)
         output.say("What class do you want to play?")
         class_name = input.inputFromOptions("class", classes.get_classes())
@@ -118,7 +121,7 @@ class Player(creature.Creature):
         return self.location.getInteraction()
 
     def act(self, action = None):
-        if self.alive == False:
+        if self.health <= 0:
             return
         self.update()
         self.classUpdate(self)
@@ -128,15 +131,15 @@ class Player(creature.Creature):
             action.activate()
 
     def interact(self):
-        if self.alive == False:
+        if self.health <= 0:
+            self.die() # player death here is arbitrary, but it will always occur because of the return statement at the beginning of self.act
             return
         # Make sure the player is up to date.
         self.updateAttributes()
         interaction = self.getInteraction()
-        if isinstance(interaction, actions.Nothing):
+        if interaction.activate() == "nothing":
             output.bar()
             return False
-        interaction.activate()
         # Make sure the player is up to date.
         self.updateAttributes()
         output.bar()
@@ -150,6 +153,8 @@ class Player(creature.Creature):
             self.act(action)
 
     def changeLocation(self, newLocation):
+        if self.location.name == newLocation.name:
+            return
         self.location.leave()
         self.location = newLocation
         self.location.enter()
@@ -170,22 +175,36 @@ class Player(creature.Creature):
     def levelUp(self):
         self.experience -= self.levelUpExperience[self.level - 1]
         self.level += 1
-        self.health = self.stats.health.getValue()
         output.proclaim("A gentle wind restores your health.")
         output.say("You leveled up to level " + str(self.level) + "!" + (" You need " + str(self.levelUpExperience[self.level - 1]) + " experience to level up again." if self.level < self.maxLevel else ""))
         self.levelBonus.activate()
+        self.health = self.stats.health.getValue()
 
     def die(self):
-        self.alive = False
-        output.bellow("You died. Game over.")
-        gameOver = input.getInput("game over")
-        # # # # # # # # # # # # # #
-        if gameOver == "debug":
-            self.alive = True
-            self.health = 1
+        output.exclaim("Death...")
+        input.pause()
+        if self.settings["permadeath"]:
+            self.alive = False
+            output.exclaim("And darkness reigns...")
+            input.pause()
+            input.close()
             return
-        # # # # # # # # # # # # # #
-        input.close()
+        output.exclaim("Great streaks of light swirl around you... seep inside you... revive you...")
+        input.pause()
+        if self.location.name != self.reviveLocation.name:
+            output.exclaim("The light lifts you... moves you...")
+            self.changeLocation(self.reviveLocation)
+            input.pause()
+        if self.level >= 5:
+            output.exclaim("But for now you are still weak...")
+            input.pause()
+            output.separate()
+            self.clearEffects()
+            self.addEffect( effect.HealthBuff("summoning sickness of health", 100, -0.2) )
+            self.addEffect( effect.StrengthBuff("summoning sickness of strength", 100, -0.2) )
+            self.addEffect( effect.ArmorBuff("summoning sickness of armor", 100, -0.2) )
+        self.health = self.stats.health.getValue()
+        output.bar()
 
     def attack(self, target):
         ability = input.inputFromOptions("attack", self.abilities, lambda ability: str(ability), lambda ability: ability.available(self), "That ability is not available right now.")

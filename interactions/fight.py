@@ -5,12 +5,11 @@ import interaction
 
 class Fight(interaction.Interaction):
 
-    def __init__(self, getMonster): # other is a function that will return a monster
+    def __init__(self, getMonster):
         interaction.Interaction.__init__(self)
         self.getMonster = getMonster
 
     def start(self):
-        self.monster = self.getMonster()
         self.monster.reset() # the same instance of the monster may have already been fought
         output.bar()
         output.declare("You have been attacked by " + self.monster.a + "!")
@@ -20,8 +19,8 @@ class Fight(interaction.Interaction):
         output.say(self.player.inspect())
         output.say(self.monster.inspect())
         self.player.attack(self.monster)
-        self.player.update()
         self.monster.attack(self.player)
+        self.player.update()
         self.monster.update()
         output.separate()
 
@@ -29,8 +28,18 @@ class Fight(interaction.Interaction):
         if self.player.health > 0:
             output.declare("You have defeated " + self.monster.the + "!")
             self.monster.die()
+            return False
         else:
-            self.player.die()
+            return True
 
     def exit(self):
         return self.player.health <= 0 or self.monster.health <= 0
+
+    def activate(self):
+        self.monster = self.getMonster()
+        if self.monster == None:
+            return "nothing" # abort if no monsters available
+        self.start()
+        while not self.exit():
+            self.tick()
+        return self.end()

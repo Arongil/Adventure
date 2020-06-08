@@ -26,15 +26,18 @@ class FrequencyList:
     def getAll(self):
         return [option[0] for option in self.options]
 
-    # A condition may be satisfied that the output must satisfy. Assume that at least one output satisfies the condition.
+    # A condition may be provided that the output must satisfy.
     def getOption(self, condition = lambda option: True):
+        impossible = [item[0] for item in self.options if not condition(item[0])]
+        if len(impossible) == len(self.options):
+            return None
         option = None
         r = random()
         for i in self.options: # sort out removing invalid options
-            if not condition(i[0]):
+            if i[0] in impossible:
                 r -= i[1]
         for i in self.options:
-            if not condition(i[0]):
+            if i[0] in impossible:
                 continue
             if r < i[1]:
                 option = i

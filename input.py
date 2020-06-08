@@ -5,7 +5,7 @@ import output
 # Automatically press <enter> after the user presses a key. That way they can type "12212" instead of "1 <enter> 2 <enter> 2 <enter> 1 <enter 2"
 controller = keyboard.Controller()
 def instant_input():
-    return globals.get_player().settings["instant-input"]
+    return globals.get_player().settings["instant input"]
 # Only instant-type for characters in [1,2,3,4,5,6,7,8,9]
 instant_keys = []
 for i in range(10):
@@ -27,6 +27,10 @@ def isInt(n):
 
 def getInput(prompt):
     return input("<" + prompt + "> ")
+
+def pause():
+    output.separate()
+    getInput("...")
 
 def getInt(prompt, lowerBound, upperBound):
     choice = getInput(prompt)

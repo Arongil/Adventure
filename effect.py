@@ -12,6 +12,7 @@ class Effect:
         self.stackable = stackable
         self.notify = notify
         self.count = 0 # count starts at zero then counts up to duration
+        self.ticked = False
 
     def startNotification(self, target):
         return self.name.capitalize() + " on " + target.the + " for " + str(self.duration) + " turns!"
@@ -20,6 +21,8 @@ class Effect:
         return self.name.capitalize() + " on " + target.the + " has ended!"
 
     def update(self, target):
+        if self.ticked:
+            return
         if self.count == 0:
             self.start(target)
             if self.notify:
@@ -31,14 +34,15 @@ class Effect:
                 output.say(self.endNotification(target))
             return
         self.tick(target)
+        self.ticked = True
         self.count = self.count + 1
 
-# stat buffs
+# MULTIPLICATIVE BUFFS
 
 class HealthBuff(Effect):
 
     def __init__(self, name, duration, amount, stackable=False, notify=True):
-        effect.__init__(self, name, duration,
+        Effect.__init__(self, name, duration,
                 lambda target: self.addHealth(target),
                 lambda target: self.removeHealth(target),
                 lambda target: None,
@@ -49,18 +53,17 @@ class HealthBuff(Effect):
         self.verb = "increased" if self.amount > 0 else "reduced"
 
     def addHealth(self, target):
-        target.stats.health.add(amount)
-        target.health += amount
+        target.stats.health.mult(self.amount)
+        if target.health > target.stats.health.getValue():
+            target.health = target.stats.health.getValue()
 
     def removeHealth(self, target):
-        target.stats.health.add(-amount)
+        target.stats.health.mult(-self.amount)
         if target.health > target.stats.health.getValue():
             target.health = target.stats.health.getValue()
 
     def startNotification(self, target):
-        return self.name.capitalize() + ": " + target.the + "'s health is " + self.verb + " by " + output.formatNumber(abs(self.amount)) + " for " + str(self.duration) + " turns. " + target.the.capitalize() + "'s maximum health is now " + str(target.stats.health) + "."
-
-# MULTIPLICATIVE BUFFS
+        return self.name.capitalize() + ": " + target.the + "'s health is " + self.verb + " by " + output.formatNumber(abs(100 * self.amount)) + "% for " + str(self.duration) + " turns."
 
 class ArmorBuff(Effect):
 
@@ -157,6 +160,34 @@ class DodgeBuff(Effect):
 
     def startNotification(self, target):
         return self.name.capitalize() + ": " + target.the + "'s dodge chance is " + self.verb + " by " + output.formatNumber(abs(100 * self.amount)) + "% for " + str(self.duration) + " turns."
+
+# Additive buffs
+
+class HealthBuffAdd(Effect):
+
+    def __init__(self, name, duration, amount, stackable=False, notify=True):
+        Effect.__init__(self, name, duration,
+                lambda target: self.addHealth(target),
+                lambda target: self.removeHealth(target),
+                lambda target: None,
+                stackable,
+                notify
+        )
+        self.amount = amount
+        self.verb = "increased" if self.amount > 0 else "reduced"
+
+    def addHealth(self, target):
+        target.stats.health.add(self.amount)
+        if target.health > target.stats.health.getValue():
+            target.health = target.stats.health.getValue()
+
+    def removeHealth(self, target):
+        target.stats.health.add(-self.amount)
+        if target.health > target.stats.health.getValue():
+            target.health = target.stats.health.getValue()
+
+    def startNotification(self, target):
+        return self.name.capitalize() + ": " + target.the + "'s health is " + self.verb + " by " + output.formatNumber(abs(self.amount)) + " for " + str(self.duration) + " turns."
 
 class ArmorBuffAdd(Effect):
 

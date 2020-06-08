@@ -65,6 +65,7 @@ class Creature:
     def addEffect(self, effect):
         if effect.stackable or effect.name not in [eff.name for eff in self.effects]:
             self.effects.append(effect)
+            effect.update(self)
 
     def removeEffect(self, effect):
         for i, eff in enumerate(self.effects):
@@ -74,9 +75,16 @@ class Creature:
                 effect.end(self)
                 return
 
+    def clearEffects(self):
+        for i in reversed(range(len(self.effects))):
+            effect = self.effects.pop(i)
+            effect.end(self)
+
+
     def updateEffects(self):
         for i in self.effects:
             i.update(self)
+            i.ticked = False
 
     def updateCooldowns(self):
         for i in self.abilities:

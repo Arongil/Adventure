@@ -12,22 +12,33 @@ class Monster(creature.Creature):
             criticalChance = kwargs.get("criticalChance") if "criticalChance" in kwargs else 0.1,
             criticalStrike = kwargs.get("criticalStrike") if "criticalStrike" in kwargs else 2
         )
-        self.unique = kwargs.get("unique") if "unique" in kwargs else False
         self.loot = loot
         self.abilities = fList.FrequencyList(abilities)
+        self.unique = kwargs.get("unique") if "unique" in kwargs else False
+        self.respawns = 1 if self.unique else -1
         self.isPlayer = False
 
+    def specialReset(self):
+        pass
+
     def reset(self):
-        self.effects = []
+        self.clearEffects()
         self.health = self.stats.health.getValue()
         for i in self.abilities:
             i.resetCooldown()
+        self.specialReset()
+
+    def canRespawn(self):
+        return self.respawns == -1 or self.respawns > 0
 
     def inspect(self):
         return ("" if self.unique else "The " ) + self.name + " has " + output.formatNumber(self.health) + "/" + str(self.stats.health) + " health."
 
     def die(self):
         self.loot.activate()
+        self.reset()
+        if self.respawns > 0:
+            self.respawns -= 1
 
     def attack(self, target):
         self.gear.proc(target)

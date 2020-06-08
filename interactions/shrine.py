@@ -25,7 +25,7 @@ class StatShrine(Shrine):
         self.amounts = amounts # amounts is an array of numbers [health, armor, strength, spirit, criticalChance, criticalStrike, dodge]
         self.duration = duration
         self.buffs = [
-            effect.HealthBuff,
+            effect.HealthBuffAdd,
             effect.ArmorBuffAdd,
             effect.StrengthBuffAdd,
             effect.SpiritBuffAdd,
@@ -42,5 +42,5 @@ class StatShrine(Shrine):
             index = stats.index(stat)
             output.say("Are you sure you want to boost " + stat.name + " by " + output.formatNumber(self.amounts[index]*stat.difficultyModifier) + " for " + str(self.duration) + " turns?")
             if input.yesNo():
-                self.player.addEffect( self.buffs[index]("shrine bonus", self.duration, self.amounts[index]) )
+                self.player.addEffect( self.buffs[index]("shrine bonus", self.duration, self.amounts[index]*stat.difficultyModifier) )
                 return

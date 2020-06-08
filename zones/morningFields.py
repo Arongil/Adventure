@@ -103,7 +103,7 @@ oldHermit = npc.NPC("Old Hermit", "I see you've wandered your way on to an adven
         "To the Brink and Back",
         "I'm not strange. I'm normal, but everyone thinks I'm strange because they're crackpots.\n\nSometimes I stand near the skeleton cave in the Silent Forest just for the thrill, you know? Evil reanimated bones could kill you at any time -- that kind of excitement.\n\nWhy don't you go try it? Come back here severely injured, under 20 health. I'll brew something up for you to drink afterward while you're at it.",
         "You're not nearly hurt enough! Go and break a leg. Literally. Get under 20 health.",
-        "Haha! The great adventurer returns to his hermit master at the lips of death, ready to return to life. That's how it's done.\n\nThe other adventurer who came down last week never returned -- his name was Jared if I recall -- and I found his bones outside the skeleton cave in the Silent Forest eaten clean. Who knows if he's been reanimated yet?\n\nOh, right. You should drink this. It'll make you feel better.",
+        "Haha! The great adventurer returns to his hermit master at the lips of death, ready to return to life. That's how it's done.\n\nThe other adventurer who came down last week never returned -- his name was Erikna if I recall -- and I found his bones outside the skeleton cave in the Silent Forest eaten clean. Who knows if he's been reanimated yet?\n\nOh, right. You should drink this. It'll make you feel better.",
         lambda player: player.health < 20,
         loot.Loot("Old Hermit", gold=0, experience=200, items=[
             [potions.HealthPotion("frothy ale", "it looks like it has ground pebbles mixed in", sellCost=6, buyCost=19, amount=22), 1],
@@ -119,17 +119,20 @@ oldHermit = npc.NPC("Old Hermit", "I see you've wandered your way on to an adven
         lambda player: player.hasCompleted("To the Brink and Back")
     )
 ])
+
 def getTraineeValley():
     def enter():
         output.proclaim("Trainee Valley: Sparse trees occupy rolling expanses of lush grass. Fort Morning is barely visible in the distant north, while the Silent Forest looms to the east.")
     def exit():
         output.proclaim("You have left Trainee Valley.")
 
+    monsters = fList.FrequencyList([
+        [Wolf(), 0.8],
+        [DrunkenTrainee(), 0.2],
+        [GraglisTheGremlin(), 0.008]
+    ])
     def getMonster():
-        return fList.FrequencyList([
-            [Wolf(), 0.8],
-            [DrunkenTrainee(), 0.2]
-        ]).getOption()
+        return monsters.getOption(condition = lambda monster: monster.canRespawn())
 
     traineeValleyActions = [
         actions.RestHeal(player),
@@ -142,8 +145,7 @@ def getTraineeValley():
     ]
     traineeValleyInteractions = [
         [actions.Nothing(), 0.8],
-        [fight.Fight(getMonster), 0.2],
-        [fight.Fight(lambda: GraglisTheGremlin()), 0.008, True]
+        [fight.Fight(getMonster), 0.2]
     ]
     return location.Location("Trainee Valley", enter, exit, traineeValleyActions, traineeValleyInteractions)
 
@@ -222,14 +224,15 @@ def getTheSilentForest():
     def exit():
         output.proclaim("You have left the Silent Forest.")
 
+    monsters = fList.FrequencyList([
+        [ProwlingFox(), 0.4],
+        [Owl(), 0.35],
+        [SorcererOutcast(), 0.2],
+        [SkeletonScout(), 0.04],
+        [DoomPanda(), 0.01]
+    ])
     def getMonster():
-        return fList.FrequencyList([
-            [ProwlingFox(), 0.4],
-            [Owl(), 0.35],
-            [SorcererOutcast(), 0.2],
-            [SkeletonScout(), 0.04],
-            [DoomPanda(), 0.01]
-        ]).getOption()
+        return monsters.getOption(condition = lambda monster: monster.canRespawn())
 
     theSilentForestActions = [
         actions.RestHeal(player),
@@ -297,12 +300,13 @@ def getSkeletonCave():
     def exit():
         output.proclaim("You have left Skeleton Cave.")
 
+    monsters = fList.FrequencyList([
+        [SkeletonWarrior(), 0.4],
+        [SkeletonArcher(), 0.4],
+        [Ghoul(), 0.2]
+    ])
     def getMonster():
-        return fList.FrequencyList([
-            [SkeletonWarrior(), 0.4],
-            [SkeletonArcher(), 0.4],
-            [Ghoul(), 0.2]
-        ]).getOption()
+        return monsters.getOption(condition = lambda monster: monster.canRespawn())
 
     skeletonCaveActions = [
         actions.RestHeal(player),
@@ -315,8 +319,8 @@ def getSkeletonCave():
         ])
     ]
     skeletonCaveInteractions = [
-        [actions.Nothing(), 0.72],
-        [fight.Fight(getMonster), 0.28]
+        [actions.Nothing(), 0.7],
+        [fight.Fight(getMonster), 0.3]
     ]
     return location.Location("Skeleton Cave", enter, exit, skeletonCaveActions, skeletonCaveInteractions)
 
@@ -337,8 +341,8 @@ class AricneaTheSly(monster.Monster):
 
     def __init__(self):
         def stingProc(wearer, target):
-            if random.random() < 0.06:
-                amount = wearer.dealDamage(target, 10 + random.random() * 8)
+            if random.random() < 0.05:
+                amount = wearer.dealDamage(target, 4 + random.random() * 6)
                 output.say("Dark tendrils burst from Sting, crushing " + target.the + " and dealing " + output.formatNumber(amount) + " damage to it.")
 
         self.sting = gear.Weapon("Sting, Bone Reaper", "Aricnea's blade pulses with an ineffable energy", sellCost=89, buyCost=299, stats={"strength": 12, "criticalStrike": 0.8}, proc=stingProc)
@@ -356,6 +360,9 @@ class AricneaTheSly(monster.Monster):
         self.dogs = fList.FrequencyList([[BoneHound(), 1]])
         self.dogFight = fight.Fight(lambda: self.dogs.getOption())
 
+    def specialReset(self):
+        self.calledDogs = False
+
     def attack(self, target):
         if self.health < 100 and not self.calledDogs:
             # The player fights two of Aricnea's dogs when Aricnea gets low on health.
@@ -363,33 +370,39 @@ class AricneaTheSly(monster.Monster):
             output.bar()
             output.exclaim("Ha! You insect think to best me? Finish the swine, dogs!")
             output.bar()
-            player.update()
-            self.dogFight.activate()
-            player.update()
-            self.dogFight.activate()
-            output.exclaim("Aaaah! You shall not defeat the forces of the undead... we are eternal!")
+            for i in range(2): # player fights two dogs
+                player.update()
+                if self.dogFight.activate(): # if player dies, stop fight
+                    return
+            output.bellow("Aaaah! You shall not defeat the forces of the undead... we are eternal!")
             self.addEffect( effect.HealOverTime("glory for the undead", 2, 30, 50) )
             self.addEffect( effect.StrengthBuff("battle rage", 9, 0.6) )
         else:
             self.abilities.getOption(lambda ability: not ability.onCooldown()).activate(self, target)
 
 def getDampLair():
+    monsters = fList.FrequencyList([
+        [AricneaTheSly(), 1]
+    ])
+
     def enter():
-        output.proclaim("Damp Lair: Cave moss grows on the arched ceiling of the cavern. A faint light glows in distance. The huge skeleton turns to face you.")
+        sequel = ""
+        if monsters[0].canRespawn(): # if Aricnea is alive...
+            sequel = "A faint light glows in distance. A huge skeleton turns to face you."
+        else: # if Aricnea is dead...
+            sequel = "Aricnea's bones lie untouched, scattered across the floor."
+        output.proclaim("Damp Lair: Cave moss grows on the arched ceiling of the cavern. " + sequel)
     def exit():
         output.proclaim("You have left Damp Lair.")
 
     def getMonster():
-        return fList.FrequencyList([
-            [AricneaTheSly(), 1]
-        ]).getOption()
+        return monsters.getOption(condition = lambda monster: monster.canRespawn())
 
     skeletonCaveActions = [
         actions.RestHeal(player)
     ]
     skeletonCaveInteractions = [
-        [fight.Fight(getMonster), 999999999, True],
-        [actions.Nothing(), 1]
+        [fight.Fight(getMonster), 1],
     ]
     return location.Location("Damp Lair", enter, exit, skeletonCaveActions, skeletonCaveInteractions)
 
@@ -401,12 +414,12 @@ class GiantSewerRat(monster.Monster):
 
     def __init__(self):
         monster.Monster.__init__(self, "giant sewer rat", 40, loot.Loot("the giant sewer rat", 3, 30, [
-                [item.Nothing(), 0.9],
-                [item.Item("strange doubloon", "cracked and faded, but it looks to be made of gold", 19, 84), 0.1]
+                [item.Nothing(), 0.85],
+                [item.Item("strange doubloon", "cracked and faded, but it looks to be made of gold", 19, 84), 0.15]
             ]), [
             # [name, cooldown, caster (always self), cast logic (takes ablty, which means ability but can't be confused with the module, and target)], probability
-            [ability.Ability("gnaw", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 8, 14)), 0.4],
-            [ability.Ability("bite", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 4, 12)), 0.4],
+            [ability.Ability("gnaw", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 8, 13)), 0.4],
+            [ability.Ability("bite", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 4, 11)), 0.4],
             [ability.Ability("sewer plague", 1, lambda ablty, caster, target: target.addEffect( effect.DamageOverTime("sewer plague", 3, 4, 6, self) )), 0.2]
         ])
 
@@ -421,6 +434,9 @@ class UnholyOoze(monster.Monster):
             [ability.Ability("spit slime", 0, lambda ablty, caster, target: ability.damage(ablty, caster, target, 6, 10)), 0.7],
             [ability.Ability("jellification", 3, lambda ablty, caster, target: caster.addEffect( effect.ArmorBuff("jellification", 2, 1.4) )), 0.3]
         ])
+        self.size = 3
+
+    def specialReset(self):
         self.size = 3
 
     def attack(self, target):
@@ -508,11 +524,12 @@ def getFortMorning():
     def exit():
         output.proclaim("You have left the Fort Morning.")
 
+    monsters = fList.FrequencyList([
+        [GiantSewerRat(), 0.8],
+        [UnholyOoze(), 0.2]
+    ])
     def getMonster():
-        return fList.FrequencyList([
-            [GiantSewerRat(), 0.8],
-            [UnholyOoze(), 0.2]
-        ]).getOption()
+        return monsters.getOption(condition = lambda monster: monster.canRespawn())
 
     fortMorningActions = [
         actions.RestHeal(player),
@@ -546,7 +563,7 @@ traineeValley.setTaxi(actions.Taxi(player, "Hello, " + str(player) + ". I hear y
 theSilentForest.setTaxi(actions.Taxi(player, "We must tread cautiously in these woods, " + str(player) + ". If you need transit, I may be able to aid you. Where do you wish to travel?", [[theSilentForest, 0], [traineeValley, 9]]))
 theSilentForest.interactions.add(actions.OfferLocationChange(player, "You spy a cave behind a crooked, dead tree. A faint clicking can be heard from within. Do you want to enter the cave?", [skeletonCave]), 0.015)
 skeletonCave.setTaxi(actions.Taxi(player, "Do you want to retrace your steps and leave the dark cave?", [[skeletonCave, 0], [theSilentForest, 0]]))
-skeletonCave.interactions.add(actions.OfferLocationChange(player, "An ominous darkness makes you shiver. In the distance, you see a large cavern occupied by a towering skeleton with a blue glowing sword. Do you want to enter the Damp Lair?", [dampLair]), 0.04, True)
+skeletonCave.interactions.add(actions.OfferLocationChange(player, "An ominous darkness makes you shiver. In the distance, you see a large cavern with a pulsing blue light. Do you want to enter the Damp Lair?", [dampLair]), 0.04)
 dampLair.setTaxi(actions.Taxi(player, "You see a soft beam of light faintly in the distance. If you follow it, you'll make your way out of the skeleton cave. Do you want to leave?", [[dampLair, 0], [theSilentForest, 0]]))
 
 fortMorning.setTaxi(actions.Taxi(player, "If you wish to travel, sir, then there's no better than the Fort Morning Coach Company. Where to?", [[fortMorning, 0], [traineeValley, 4]]))
