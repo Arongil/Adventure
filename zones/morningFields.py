@@ -437,6 +437,7 @@ class UnholyOoze(monster.Monster):
         self.size = 3
 
     def specialReset(self):
+        self.stats.health.value = 60
         self.size = 3
 
     def attack(self, target):
