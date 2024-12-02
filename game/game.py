@@ -1,7 +1,7 @@
 import traceback
-import globals
-import input
-import output
+import game.globals as globals
+import game.input as input
+import game.output as output
 import zones.morningFields as morningFields
 
 class Game:

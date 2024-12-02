@@ -1,6 +1,6 @@
 from pynput import keyboard
-import globals
-import output
+import game.globals as globals
+import game.output as output
 
 # Automatically press <enter> after the user presses a key. That way they can type "12212" instead of "1 <enter> 2 <enter> 2 <enter> 1 <enter 2"
 controller = keyboard.Controller()

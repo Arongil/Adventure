@@ -1,4 +1,4 @@
-import output
+import game.output as output
 from random import random
 
 class Effect:

@@ -1,6 +1,6 @@
-import globals
-import input
-import output
+import game.globals as globals
+import game.input as input
+import game.output as output
 
 # Quest holds all the information to give and complete an arbitrary quest in game.
 # openerText is the quest description when an NPC first offers it.

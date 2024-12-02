@@ -1,4 +1,4 @@
-import frequencyList as fList
+import game.frequencyList as fList
 
 class Location:
 

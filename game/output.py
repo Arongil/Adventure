@@ -15,7 +15,7 @@ def _printNoCutoff(string, prefix, cutoff):
     for line in lines:
         print(prefix + line)
 
-def printNoCutoff(string, prefix="", cutoff=100):
+def printNoCutoff(string, prefix="", cutoff=80):
     if prefix == "\t":
         cutoff -= 8
     blocks = str(string).split("\n")

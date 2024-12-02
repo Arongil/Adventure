@@ -1,4 +1,4 @@
-import globals
+import game.globals as globals
 
 class Item:
 

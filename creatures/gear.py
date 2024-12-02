@@ -1,5 +1,5 @@
-import item
-import output
+import game.item as item
+import game.output as output
 
 class Gear:
 

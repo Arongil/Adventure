@@ -1,4 +1,4 @@
-import output
+import game.output as output
 
 class Stat:
 

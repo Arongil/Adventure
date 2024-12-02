@@ -1,5 +1,5 @@
 from random import random
-import output
+import game.output as output
 import creatures.stats as stats
 import creatures.gear as gear
 import creatures.inventory as inventory

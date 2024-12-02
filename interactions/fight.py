@@ -1,7 +1,7 @@
 from random import random
 import copy
-import output
-import interaction
+import game.output as output
+import game.interaction as interaction
 
 class Fight(interaction.Interaction):
 

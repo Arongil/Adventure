@@ -1,13 +1,13 @@
-import input
-import output
-import frequencyList as fList
+import game.input as input
+import game.output as output
+import game.frequencyList as fList
 import creatures.creature as creature
 import creatures.classes as classes
 import creatures.gear as gear
-import item
-import ability
-import actions
-import effect
+import game.item as item
+import game.ability as ability
+import game.actions as actions
+import game.effect as effect
 
 class Player(creature.Creature):
 

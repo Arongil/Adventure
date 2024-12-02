@@ -1,6 +1,6 @@
-import globals
-import input
-import output
+import game.globals as globals
+import game.input as input
+import game.output as output
 
 # The NPC stores three pieces of data. The name is the NPC's name. The opener is what the NPC says no matter what. Quests is an optional array that contains Quest objects. Example:
 # name = "Barton the Grizzled"

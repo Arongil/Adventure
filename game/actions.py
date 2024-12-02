@@ -1,11 +1,11 @@
 from random import randint
 import copy
-import input
-import output
-import frequencyList as fList
-import item
-import interaction
-import action
+import game.input as input  
+import game.output as output
+import game.frequencyList as fList
+import game.item as item
+import game.interaction as interaction
+import game.action as action
 
 # Nothing is a null action; it does nothing.
 class Nothing(action.Action):

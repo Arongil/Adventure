@@ -1,5 +1,5 @@
 from random import random
-import output
+import game.output as output
 import creatures.stat as stat
 
 class Stats:

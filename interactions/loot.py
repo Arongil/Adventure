@@ -1,8 +1,8 @@
 import copy
-import output
-import frequencyList as fList
-import interaction
-import item
+import game.output as output
+import game.frequencyList as fList
+import game.interaction as interaction
+import game.item as item
 
 class Loot(interaction.Interaction):
 

@@ -1,6 +1,6 @@
-import output
-import effect
-import item
+import game.output as output
+import game.effect as effect
+import game.item as item
 
 class HealthPotion(item.UsableItem):
 

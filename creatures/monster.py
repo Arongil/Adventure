@@ -1,5 +1,5 @@
-import output
-import frequencyList as fList
+import game.output as output
+import game.frequencyList as fList
 import creatures.creature as creature
 
 class Monster(creature.Creature):

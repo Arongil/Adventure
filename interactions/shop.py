@@ -1,8 +1,8 @@
 import copy
-import globals
-import input
-import output
-import item
+import game.globals as globals
+import game.input as input
+import game.output as output
+import game.item as item
 
 class Shop:
 

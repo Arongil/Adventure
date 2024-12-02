@@ -1,8 +1,8 @@
-import input
-import output
-import frequencyList as fList
-import interaction
-import effect
+import game.input as input
+import game.output as output
+import game.frequencyList as fList
+import game.interaction as interaction
+import game.effect as effect
 
 class Shrine(interaction.Interaction):
 

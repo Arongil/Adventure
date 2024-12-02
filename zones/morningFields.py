@@ -1,7 +1,7 @@
 import random
-import globals
-import output
-import frequencyList as fList
+import game.globals as globals
+import game.output as output
+import game.frequencyList as fList
 import interactions.fight as fight
 import interactions.loot as loot
 import interactions.shop as shop
@@ -11,11 +11,11 @@ import creatures.gear as gear
 import items.potions as potions
 import npcs.npc as npc
 import npcs.quest as quest
-import location
-import actions
-import ability
-import effect
-import item
+import game.location as location
+import game.actions as actions
+import game.ability as ability
+import game.effect as effect
+import game.item as item
 
 player = globals.get_player()
 

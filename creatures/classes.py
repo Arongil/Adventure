@@ -1,10 +1,10 @@
 import random
-import globals
-import output
+import game.globals as globals
+import game.output as output
 import creatures.stats as stats
-import ability
-import actions
-import effect
+import game.ability as ability
+import game.actions as actions
+import game.effect as effect
 
 classes = dict()
 
