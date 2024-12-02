@@ -1,6 +1,6 @@
-# Adventure 🍺
+# Text Adventure 🍺
 
-Welcome to the deep, dark terminal... home of the text adventure.
+Dive into the adventure:
 
 * Play as mage, rogue, or paladin
 * Level up to learn new abilities
@@ -8,26 +8,20 @@ Welcome to the deep, dark terminal... home of the text adventure.
 * Gear up your character to get powerful
 * Explore three zones and their secrets
 
-Is that hermit really so nice?
+<div align="center" >
+    <img src="assets/demo.gif" height="350" />
+    <p>Demo gameplay. Is the hermit really that nice?</p>
+</div>
 
-## Zones
+## Three zones
 
 Trainee Valley: land of wolves and the hermit. Level up a while, do a few quests. Don't get too drunk, will you?
 
-Fort Morning: bastion of the shop and the slime. And Captain Jorna has bigger plans in store.
+Fort Morning: bastion of the shop and the slime. And Captain Jorna \*burp\* has bigger plans in store.
 
-Silent Forest: home to the doom panda and wily fox. Seekers here never returned alive from the skeleton cave...
+Silent Forest: home to the doom panda and wily fox. Seekers never return alive from the skeleton cave...
 
-## How to play
-
-1. `pip install -r requirements.txt`
-2. `python Adventure.py`
-3. Choose which class to play.
-4. Choose a difficulty level.
-
-On Mac you may need to allow "Settings > Privacy > Accessibility > Terminal" for instant keypress reads.
-
-## The thirteen elements
+## Thirteen elements
 
 The journal of the gamemasters... here to give you your bearings.
 
@@ -111,6 +105,15 @@ The journal of the gamemasters... here to give you your bearings.
 	eliminates the need to press <enter> after each turn. Permadeath removes the chance to
 	revive when killed. Warning: if you die with permadeath set to True, your run will
 	terminate.
+
+## How to play
+
+1. `pip install -r requirements.txt`
+2. `python Adventure.py`
+3. Choose which class to play.
+4. Choose a difficulty level.
+
+On Mac you may need to allow "Settings > Privacy > Accessibility > Terminal" for instant keypress reads.
 
 ## History
 
